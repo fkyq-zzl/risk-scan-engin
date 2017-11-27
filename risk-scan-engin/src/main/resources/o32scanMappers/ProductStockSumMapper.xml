@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.o32scan.dao.ProductStockSumMapper">
+	<resultMap id="BaseResultMap" type="com.cjhx.risk.o32scan.domain.ProductStockSum">
+		<result column="L_DATE" jdbcType="DECIMAL" property="lDate" />
+		<result column="VC_PROD_CODE" jdbcType="VARCHAR" property="vcProdCode" />
+		<result column="VC_KMDM" jdbcType="VARCHAR" property="vcKmdm" />
+		<result column="VC_KMMC" jdbcType="VARCHAR" property="vcKmmc" />
+		<result column="EN_VALUE" jdbcType="DECIMAL" property="enValue" />
+		<result column="INSERT_TIME" jdbcType="TIMESTAMP" property="insertTime" />
+	</resultMap>
+
+	<select id="selectDenominatorSumValue" resultType="com.cjhx.risk.scan.model.StockValueDto">
+	  	select  <if test='summaryType == "0" or summaryType == "1" or summaryType == "2"'>
+					v.vcProdCode,
+				</if>
+				nvl(sum(v.sumValue),0) as totalValue from
+		  	<foreach collection="productList" index="index" item="product" open="(" separator="union all" close=")v">
+				<foreach collection="denominatorItems" index="index" item="dItem" open="" separator="union all" close="">
+					<if test='dItem.kmdmCode != null'>
+						select ss.vc_prod_code as vcProdCode,ss.en_value as sumValue 
+						from product_stock_sum ss
+						where ss.l_date = #{scanDatabaseDate}
+<!-- 						  ss.l_date = (select max(tem.l_date) 
+						                   from product_stock_sum tem 
+						                   where tem.vc_prod_code = #{product.productionCode} 
+						                   and tem.vc_kmdm = #{dItem.kmdmCode}) -->
+						and ss.vc_prod_code = #{product.productionCode} 
+						and ss.vc_kmdm = #{dItem.kmdmCode}
+					</if>
+					<if test='dItem.kmdmCode == null'>
+						select '' as vcProdCode,0 as sumValue from dual where 1=0	
+					</if>
+				</foreach>
+			</foreach>
+		<if test='summaryType == "0" or summaryType == "1" or summaryType == "2"'>
+			group by v.vcProdCode
+		</if>
+	</select>
+
+	<select id="selectSpecialMoleculeSumValue" resultType="com.cjhx.risk.scan.model.StockValueDto">
+	  	select  <if test='summaryType == "0" or summaryType == "1" or summaryType == "2"'>
+					v.vcProdCode,
+				</if>
+			nvl(sum(v.sumValue),0) as totalValue from
+		  	<foreach collection="productList" index="index" item="product" open="(" separator="union all" close=")v">
+				<foreach collection="numeratorList" index="index" item="dItem" open="" separator="union all" close="">
+					<if test='dItem.kmdmCode != null'>
+						select ss.vc_prod_code as vcProdCode,
+								<if test='dItem.opeartor == "2"'>0-</if>ss.en_value as sumValue 
+						from product_stock_sum ss
+						where ss.l_date = #{scanDatabaseDate}
+						<!--  ss.l_date = (select max(tem.l_date) 
+						                   from product_stock_sum tem 
+						                   where tem.vc_prod_code = #{product.productionCode} 
+						                   and tem.vc_kmdm = #{dItem.kmdmCode}) -->
+						and ss.vc_prod_code = #{product.productionCode} 
+						and ss.vc_kmdm = #{dItem.kmdmCode}
+					</if>
+					<if test='dItem.kmdmCode == null'>
+						select 0 as sumValue from dual where 1=0	
+					</if>
+				</foreach>
+			</foreach>
+		<if test='summaryType == "0" or summaryType == "1" or summaryType == "2"'>
+			group by v.vcProdCode
+		</if>
+	</select>
+	
+</mapper>

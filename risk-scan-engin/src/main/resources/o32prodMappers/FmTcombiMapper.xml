@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.o32prod.dao.FmTcombiMapper">
+	<resultMap id="BaseResultMap" type="com.cjhx.risk.o32prod.domain.FmTcombi">
+		<result column="L_COMBI_ID" jdbcType="DECIMAL" property="lCombiId" />
+		<result column="L_FUND_ID" jdbcType="DECIMAL" property="lFundId" />
+		<result column="VC_COMBI_NO" jdbcType="VARCHAR" property="vcCombiNo" />
+		<result column="VC_COMBI_NAME" jdbcType="VARCHAR" property="vcCombiName" />
+		<result column="L_ASSET_ID" jdbcType="DECIMAL" property="lAssetId" />
+	</resultMap>
+
+	<select id="selectCombiNameByCombiNo" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		select VC_COMBI_NAME
+		from FM_TCOMBI
+		where VC_COMBI_NO = #{combiNo}
+	</select>
+
+</mapper>

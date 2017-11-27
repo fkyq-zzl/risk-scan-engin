@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.o32scan.dao.ProductStockDetailMapper">
+	<resultMap id="BaseResultMap"
+		type="com.cjhx.risk.o32scan.domain.ProductStockDetail">
+		<result column="L_DATE" jdbcType="DECIMAL" property="lDate" />
+		<result column="VC_PROD_CODE" jdbcType="CHAR" property="vcProdCode" />
+		<result column="VC_PROD_NAME" jdbcType="VARCHAR" property="vcProdName" />
+		<result column="C_STOCK_TYPE" jdbcType="VARCHAR" property="cStockType" />
+		<result column="C_MARKET_NO" jdbcType="VARCHAR" property="cMarketNo" />
+		<result column="VC_STOCK_CODE" jdbcType="CHAR" property="vcStockCode" />
+		<result column="C_POSITION_FLAG" jdbcType="VARCHAR" property="cPositionFlag" />
+		<result column="C_INVEST_TYPE" jdbcType="VARCHAR" property="cInvestType" />
+		<result column="C_STATUS" jdbcType="VARCHAR" property="cStatus" />
+		<result column="L_AMOUNT" jdbcType="DECIMAL" property="lAmount" />
+		<result column="EN_NET_VALUE" jdbcType="DECIMAL" property="enNetValue" />
+		<result column="EN_ALL_VALUE" jdbcType="DECIMAL" property="enAllValue" />
+		<result column="EN_COST" jdbcType="DECIMAL" property="enCost" />
+		<result column="INSERT_TIME" jdbcType="TIMESTAMP" property="insertTime" />
+		<result column="L_ZQNM" jdbcType="DECIMAL" property="lZqnm" />
+		<result column="VC_ZQJC" jdbcType="VARCHAR" property="vcZqjc" />
+	</resultMap>
+
+	<select id="selectRelatedProductStocks"
+		resultType="com.cjhx.risk.o32scan.domain.AllStockInfoHis">
+<!-- 		with product_stock_detail_temp as(
+			select temp.* from (
+				select row_number() over(partition by psd.vc_prod_code,
+													  psd.c_stock_type,
+													  psd.c_market_no,
+													  psd.vc_stock_code 
+			                             order by psd.l_date desc) as row_number_temp,
+					   psd.*
+				from product_stock_detail psd )temp
+			where temp.row_number_temp = 1) -->
+		
+		select p.vc_prod_code as vcProdCode,s.vc_inter_code_o32 as vcInterCodeO32,
+			s.vc_stock_name as vcStockName ,
+			s.l_issuer_id as lIssuerId, s.vc_issuer_name as vcIssuerName
+		from all_stock_info_his s,product_stock_detail p
+		where s.l_date = #{scanDatabaseDate}
+		and p.l_date = #{scanDatabaseDate}
+		and s.vc_stock_code = p.vc_stock_code
+		and s.vc_stock_type = p.c_stock_type
+		and s.c_market_no_2 = p.c_market_no
+		and p.vc_prod_code in
+			<foreach collection="productList" index="index" item="product" open="(" separator="," close=")">
+				#{product.productionCode}
+			</foreach>
+		and s.vc_inter_code_o32 in (${addInnercodeSql})
+		and s.vc_inter_code_o32 not in (${subInnercodeSql})
+	</select>
+	
+	<select id="selectRangeRelatedProductStocks"
+		resultType="com.cjhx.risk.o32scan.domain.AllStockInfoHis">
+		select p.vc_prod_code as vcProdCode,s.vc_inter_code_o32 as vcInterCodeO32,
+			s.vc_stock_name as vcStockName ,
+			s.l_issuer_id as lIssuerId, s.vc_issuer_name as vcIssuerName
+		from all_stock_info_his s,product_stock_detail p
+		where s.l_date = #{scanDatabaseDate}
+		and p.l_date = #{scanDatabaseDate}
+		and s.vc_stock_code = p.vc_stock_code
+		and s.vc_stock_type = p.c_stock_type
+		and s.c_market_no_2 = p.c_market_no
+		and p.vc_prod_code in
+			<foreach collection="productList" index="index" item="product" open="(" separator="," close=")">
+				#{product.productionCode}
+			</foreach>
+		and s.vc_inter_code_o32 in (${allAddInnercodeSql})
+		and s.vc_inter_code_o32 not in (${allSubInnercodeSql})
+		and s.vc_inter_code_o32 not in (select asit.vc_inter_code_o32 
+										from all_stock_info_his asit
+										where asit.l_date = #{scanDatabaseDate}
+										and asit.vc_inter_code_o32 in (${addInnercodeSql})
+										and asit.vc_inter_code_o32 not in (${subInnercodeSql}))
+	</select>
+
+	<select id="selectRelatedProductStockValues" parameterType="com.cjhx.risk.scan.model.StockValuePage"
+		resultType="com.cjhx.risk.scan.model.StockValueDto">
+		<!-- with product_stock_detail_temp as(
+			select temp.* from (
+				select row_number() over(partition by psd.vc_prod_code,
+													  psd.c_stock_type,
+													  psd.c_market_no,
+													  psd.vc_stock_code 
+			                             order by psd.l_date desc) as row_number_temp,
+					   psd.*
+				from product_stock_detail psd )temp
+			where temp.row_number_temp = 1) -->
+		
+		select s.vc_inter_code_o32 as vcInterCodeO32, s.vc_stock_name as vcStockName,
+			s.l_issuer_id as lIssuerId, s.vc_issuer_name as vcIssuerName,
+			p.L_AMOUNT as lAmount, p.EN_NET_VALUE as enNetValue, 
+			p.EN_ALL_VALUE as enAllValue, p.EN_COST as enCost,
+			p.vc_prod_code as vcProdCode
+		from all_stock_info_his s,product_stock_detail p
+		where s.l_date = #{scanDatabaseDate}
+		and p.l_date = #{scanDatabaseDate}
+		and s.vc_stock_code = p.vc_stock_code
+		and s.vc_stock_type = p.c_stock_type
+		and s.c_market_no_2 = p.c_market_no
+		and s.l_issuer_id is not null
+		and p.vc_prod_code in
+			<foreach collection="productList" index="index" item="product" open="(" separator="," close=")">
+				#{product.productionCode}
+			</foreach>
+		and s.vc_inter_code_o32 in (${hisAddInnercodeSql})
+		and s.vc_inter_code_o32 not in (${hisSubInnercodeSql})
+<!-- 		and <if test='numeratorType == "0"'>p.L_AMOUNT</if>
+		<if test='numeratorType == "1"'>p.EN_NET_VALUE</if>
+		<if test='numeratorType == "2"'>p.EN_COST</if>
+		<if test='numeratorType == "3"'>p.EN_ALL_VALUE</if>
+		<if test='operator == "1"'><![CDATA[>]]></if>
+		<if test='operator == "2"'><![CDATA[>=]]></if>
+		<if test='operator == "3"'><![CDATA[<]]></if>
+		<if test='operator == "4"'><![CDATA[<=]]></if>
+		#{threshold} -->
+	</select>
+	<select id="selectFundStockTotalValues" parameterType="com.cjhx.risk.scan.model.StockValuePage"
+		resultType="com.cjhx.risk.scan.model.StockValueDto">
+		<!-- with product_stock_detail_temp as(
+			select temp.* from (
+				select row_number() over(partition by psd.vc_prod_code,
+													  psd.c_stock_type,
+													  psd.c_market_no,
+													  psd.vc_stock_code 
+			                             order by psd.l_date desc) as row_number_temp,
+					   psd.*
+				from product_stock_detail psd )temp
+			where temp.row_number_temp = 1) -->
+		
+		select  <if test='summaryType == "0" or summaryType == "1" or summaryType == "2"'>
+					p.vc_prod_code as vcProdCode,
+				</if>
+				<if test='summaryType == "1" or summaryType == "4"'>
+					s.l_issuer_id as lIssuerId,
+				</if>
+				<if test='summaryType == "0" or summaryType == "3"'>
+					s.vc_inter_code_o32 as vcInterCodeO32,
+				</if>
+				<if test='numeratorType == "0"'>nvl(sum(p.L_AMOUNT),0)</if>
+				<if test='numeratorType == "1"'>nvl(sum(p.EN_NET_VALUE),0)</if>
+				<if test='numeratorType == "2"'>nvl(sum(p.EN_COST),0)</if>
+				<if test='numeratorType == "3"'>nvl(sum(p.EN_ALL_VALUE),0)</if>
+				as totalValue
+		from all_stock_info_his s,product_stock_detail p
+		where s.l_date = #{scanDatabaseDate}
+		and p.l_date = #{scanDatabaseDate}
+		and s.vc_stock_code = p.vc_stock_code
+		and s.vc_stock_type = p.c_stock_type
+		and s.c_market_no_2 = p.c_market_no
+<!-- 		<if test="issuerId != null">
+			and s.l_issuer_id = #{issuerId}
+		</if> -->
+		and p.vc_prod_code in
+			<foreach collection="productList" index="index" item="product" open="(" separator="," close=")">
+				#{product.productionCode}
+			</foreach>
+<!-- 		<if test="interCode != null">
+			and s.vc_inter_code_o32 = #{interCode}
+		</if> -->
+		<if test="hisAddInnercodeSql != null">
+			and s.vc_inter_code_o32 in (${hisAddInnercodeSql})
+		</if>
+		<if test="hisSubInnercodeSql != null">
+			and s.vc_inter_code_o32 not in (${hisSubInnercodeSql})
+		</if>
+<!-- 	<if test='operator == "1"'><![CDATA[>]]></if>
+		<if test='operator == "2"'><![CDATA[>=]]></if>
+		<if test='operator == "3"'><![CDATA[<]]></if>
+		<if test='operator == "4"'><![CDATA[<=]]></if>
+		#{threshold} -->
+		<if test='summaryType != "5"'>
+			group by
+			<trim prefix="" suffix="" suffixOverrides=",">
+				<if test='summaryType == "0" or summaryType == "1" or summaryType == "2"'>
+					p.vc_prod_code,
+				</if>
+				<if test='summaryType == "1" or summaryType == "4"'>
+					s.l_issuer_id,
+				</if>
+				<if test='summaryType == "0" or summaryType == "3"'>
+					s.vc_inter_code_o32,
+				</if>
+			</trim>
+		</if>
+	</select>
+	
+	<select id="selectProductStocksBySameCompany" parameterType="com.cjhx.risk.scan.model.StockValuePage"
+		resultType="com.cjhx.risk.scan.model.RcScanRuleDetailValue">
+		<!-- with product_stock_detail_temp as(
+			select temp.* from (
+				select row_number() over(partition by psd.vc_prod_code,
+													  psd.c_stock_type,
+													  psd.c_market_no,
+													  psd.vc_stock_code 
+			                             order by psd.l_date desc) as row_number_temp,
+					   psd.*
+				from product_stock_detail psd )temp
+			where temp.row_number_temp = 1) -->
+		
+		select p.vc_prod_code as productionId, s.VC_INTER_CODE_O32 as stockId, 
+			s.VC_STOCK_NAME as stockName,
+			<if test='numeratorType == "0"'>p.L_AMOUNT</if>
+			<if test='numeratorType == "1"'>p.EN_NET_VALUE</if>
+			<if test='numeratorType == "2"'>p.EN_COST</if>
+			<if test='numeratorType == "3"'>p.EN_ALL_VALUE</if>
+			as computeValue
+		from all_stock_info_his s,product_stock_detail p
+		where s.l_date = #{scanDatabaseDate}
+		and p.l_date = #{scanDatabaseDate}
+		and s.vc_stock_code = p.vc_stock_code
+		and s.vc_stock_type = p.c_stock_type
+		and s.c_market_no_2 = p.c_market_no
+		and s.l_issuer_id = #{issuerId}
+		and p.vc_prod_code in
+			<foreach collection="productList" index="index" item="product" open="(" separator="," close=")">
+				#{product.productionCode}
+			</foreach>
+	</select>
+	
+</mapper>

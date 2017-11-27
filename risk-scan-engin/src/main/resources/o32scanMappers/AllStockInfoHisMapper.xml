@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.o32scan.dao.AllStockInfoHisMapper">
+	<resultMap id="BaseResultMap" type="com.cjhx.risk.o32scan.domain.AllStockInfoHis">
+		<result column="L_DATE" jdbcType="DECIMAL" property="lDate" />
+		<result column="C_MARKET_NO_1" jdbcType="CHAR" property="cMarketNo1" />
+		<result column="C_MARKET_NO_2" jdbcType="CHAR" property="cMarketNo2" />
+		<result column="VC_STOCK_TYPE" jdbcType="VARCHAR" property="vcStockType" />
+		<result column="VC_INTER_CODE_WIND1" jdbcType="VARCHAR"
+			property="vcInterCodeWind1" />
+		<result column="VC_INTER_CODE_WIND2" jdbcType="VARCHAR"
+			property="vcInterCodeWind2" />
+		<result column="VC_INTER_CODE_O32" jdbcType="VARCHAR" property="vcInterCodeO32" />
+		<result column="VC_STOCK_CODE" jdbcType="VARCHAR" property="vcStockCode" />
+		<result column="VC_STOCK_NAME" jdbcType="VARCHAR" property="vcStockName" />
+		<result column="VC_STOCK_NAME_FULL" jdbcType="VARCHAR"
+			property="vcStockNameFull" />
+		<result column="VC_BOND_TYPE_WIND_1" jdbcType="VARCHAR"
+			property="vcBondTypeWind1" />
+		<result column="VC_BOND_TYPE_WIND_2" jdbcType="VARCHAR"
+			property="vcBondTypeWind2" />
+		<result column="VC_ISSUE_TYPE" jdbcType="VARCHAR" property="vcIssueType" />
+		<result column="EN_EXIST_LIMITE" jdbcType="DECIMAL" property="enExistLimite" />
+		<result column="EN_ISSUE_BALANCE" jdbcType="DECIMAL" property="enIssueBalance" />
+		<result column="L_ISSUER_ID" jdbcType="VARCHAR" property="lIssuerId" />
+		<result column="VC_ISSUER_NAME" jdbcType="VARCHAR" property="vcIssuerName" />
+		<result column="VC_ISSUER_NAME_FULL" jdbcType="VARCHAR"
+			property="vcIssuerNameFull" />
+		<result column="C_ISSUER_PROPERTY" jdbcType="CHAR" property="cIssuerProperty" />
+		<result column="EN_ISSUER_NET_VALUE" jdbcType="DECIMAL"
+			property="enIssuerNetValue" />
+		<result column="VC_ISSUER_PUNISH_INFO" jdbcType="VARCHAR"
+			property="vcIssuerPunishInfo" />
+		<result column="L_ISSUE_POST_DATE" jdbcType="DECIMAL" property="lIssuePostDate" />
+		<result column="L_ISSUE_BEGIN_DATE" jdbcType="DECIMAL"
+			property="lIssueBeginDate" />
+		<result column="L_ISSUE_END_DATE" jdbcType="DECIMAL" property="lIssueEndDate" />
+		<result column="C_BID_TYPE" jdbcType="CHAR" property="cBidType" />
+		<result column="C_PAY_TYPE" jdbcType="VARCHAR" property="cPayType" />
+		<result column="L_PAY_DATE" jdbcType="DECIMAL" property="lPayDate" />
+		<result column="L_PUBLISH_DATE" jdbcType="DECIMAL" property="lPublishDate" />
+		<result column="L_DELISTING_DATE" jdbcType="DECIMAL" property="lDelistingDate" />
+		<result column="L_BEGINCAL_DATE" jdbcType="DECIMAL" property="lBegincalDate" />
+		<result column="L_ENDINCAL_DATE" jdbcType="DECIMAL" property="lEndincalDate" />
+		<result column="L_ENDINCAL_DAYS" jdbcType="DECIMAL" property="lEndincalDays" />
+		<result column="L_LIMITE_LEFT" jdbcType="DECIMAL" property="lLimiteLeft" />
+		<result column="L_TIME_LIMIT" jdbcType="DECIMAL" property="lTimeLimit" />
+		<result column="L_GUARANTOR_ID" jdbcType="VARCHAR" property="lGuarantorId" />
+		<result column="VC_GUARANTOR_NAME" jdbcType="VARCHAR" property="vcGuarantorName" />
+		<result column="VC_GUARANTOR_SUMMARY" jdbcType="VARCHAR"
+			property="vcGuarantorSummary" />
+		<result column="C_ASSURE_TYPE" jdbcType="CHAR" property="cAssureType" />
+		<result column="VC_MAIN_UNDERWRITER_ID" jdbcType="VARCHAR"
+			property="vcMainUnderwriterId" />
+		<result column="VC_MAIN_UNDERWRITER" jdbcType="VARCHAR"
+			property="vcMainUnderwriter" />
+		<result column="VC_DEPUTY_UNDERWRITER_ID" jdbcType="VARCHAR"
+			property="vcDeputyUnderwriterId" />
+		<result column="VC_DEPUTY_UNDERWRITER" jdbcType="VARCHAR"
+			property="vcDeputyUnderwriter" />
+		<result column="C_UNDERWRITE_TYPE" jdbcType="CHAR" property="cUnderwriteType" />
+		<result column="VC_GROUP_UNDERWRITER" jdbcType="VARCHAR"
+			property="vcGroupUnderwriter" />
+		<result column="C_BOND_APPRAISE_1" jdbcType="CHAR" property="cBondAppraise1" />
+		<result column="C_BOND_APPRAISE_2" jdbcType="CHAR" property="cBondAppraise2" />
+		<result column="C_BOND_APPRAISE_3" jdbcType="CHAR" property="cBondAppraise3" />
+		<result column="C_BOND_APPRAISE_4" jdbcType="CHAR" property="cBondAppraise4" />
+		<result column="C_ISSUER_APPRAISE_1" jdbcType="CHAR"
+			property="cIssuerAppraise1" />
+		<result column="C_ISSUER_APPRAISE_2" jdbcType="CHAR"
+			property="cIssuerAppraise2" />
+		<result column="C_ISSUER_APPRAISE_3" jdbcType="CHAR"
+			property="cIssuerAppraise3" />
+		<result column="C_ISSUER_APPRAISE_4" jdbcType="CHAR"
+			property="cIssuerAppraise4" />
+		<result column="VC_BOND_APPRAISE_ORGA" jdbcType="VARCHAR"
+			property="vcBondAppraiseOrga" />
+		<result column="VC_ISSUER_APPRAISE_ORGA" jdbcType="VARCHAR"
+			property="vcIssuerAppraiseOrga" />
+		<result column="C_ISSUER_APPRAISE_FORECAST" jdbcType="CHAR"
+			property="cIssuerAppraiseForecast" />
+		<result column="C_ISSUER_APPRAISE_CSRC" jdbcType="CHAR"
+			property="cIssuerAppraiseCsrc" />
+		<result column="C_MAIN_UNDERWRITER_APPRAISE" jdbcType="CHAR"
+			property="cMainUnderwriterAppraise" />
+		<result column="VC_INDUSTRY_WIND" jdbcType="VARCHAR" property="vcIndustryWind" />
+		<result column="VC_INDUSTRY_WIND_1" jdbcType="VARCHAR"
+			property="vcIndustryWind1" />
+		<result column="VC_INDUSTRY_WIND_2" jdbcType="VARCHAR"
+			property="vcIndustryWind2" />
+		<result column="VC_INDUSTRY_WIND_3" jdbcType="VARCHAR"
+			property="vcIndustryWind3" />
+		<result column="VC_INDUSTRY_WIND_4" jdbcType="VARCHAR"
+			property="vcIndustryWind4" />
+		<result column="VC_INDUSTRY_CSRC" jdbcType="VARCHAR" property="vcIndustryCsrc" />
+		<result column="VC_INDUSTRY_CSRC_1" jdbcType="VARCHAR"
+			property="vcIndustryCsrc1" />
+		<result column="VC_INDUSTRY_CSRC_2" jdbcType="VARCHAR"
+			property="vcIndustryCsrc2" />
+		<result column="VC_INDUSTRY_CSRC_3" jdbcType="VARCHAR"
+			property="vcIndustryCsrc3" />
+		<result column="VC_INDUSTRY_CSRC_4" jdbcType="VARCHAR"
+			property="vcIndustryCsrc4" />
+		<result column="VC_PROVINCE" jdbcType="VARCHAR" property="vcProvince" />
+		<result column="VC_BCHMK_RATE" jdbcType="VARCHAR" property="vcBchmkRate" />
+		<result column="EN_PARVALUE" jdbcType="DECIMAL" property="enParvalue" />
+		<result column="EN_FACE_RATE" jdbcType="DECIMAL" property="enFaceRate" />
+		<result column="C_IS_FLAT_TRADING" jdbcType="CHAR" property="cIsFlatTrading" />
+		<result column="C_INTEREST_TYPE" jdbcType="CHAR" property="cInterestType" />
+		<result column="VC_INTEREST_RATE_DESC" jdbcType="VARCHAR"
+			property="vcInterestRateDesc" />
+		<result column="C_PAY_INTEREST_TYPE" jdbcType="CHAR"
+			property="cPayInterestType" />
+		<result column="EN_PAY_INTEVAL" jdbcType="DECIMAL" property="enPayInteval" />
+		<result column="L_NEXT_PAYINT_DATE" jdbcType="DECIMAL"
+			property="lNextPayintDate" />
+		<result column="L_NEXT_PAYINT_DAYS" jdbcType="DECIMAL"
+			property="lNextPayintDays" />
+		<result column="L_NEXT_EXERCISE_DATE" jdbcType="DECIMAL"
+			property="lNextExerciseDate" />
+		<result column="VC_SPECIAL_TEXT" jdbcType="VARCHAR" property="vcSpecialText" />
+		<result column="VC_SPECIAL_TEXT_DESC" jdbcType="VARCHAR"
+			property="vcSpecialTextDesc" />
+		<result column="VC_SPECIAL_LIMITE" jdbcType="VARCHAR" property="vcSpecialLimite" />
+		<result column="L_N_INTEREST_RATE_JUMP_POINTS" jdbcType="DECIMAL"
+			property="lNInterestRateJumpPoints" />
+		<result column="C_IS_HAVE_SALEBACK" jdbcType="CHAR" property="cIsHaveSaleback" />
+		<result column="EN_CB_VALUE_CONVEXITY" jdbcType="DECIMAL"
+			property="enCbValueConvexity" />
+		<result column="EN_CB_VALUE_MDURATIO" jdbcType="DECIMAL"
+			property="enCbValueMduratio" />
+		<result column="EN_CB_VALUE_INCM_RATE" jdbcType="DECIMAL"
+			property="enCbValueIncmRate" />
+		<result column="EN_CB_VALUE_NET_VALUE" jdbcType="DECIMAL"
+			property="enCbValueNetValue" />
+		<result column="EN_CB_VALUE_ALL_VALUE" jdbcType="DECIMAL"
+			property="enCbValueAllValue" />
+		<result column="EN_CZ_VALUE_CONVEXITY" jdbcType="DECIMAL"
+			property="enCzValueConvexity" />
+		<result column="EN_CZ_VALUE_MDURATIO" jdbcType="DECIMAL"
+			property="enCzValueMduratio" />
+		<result column="EN_CZ_VALUE_INCM_RATE" jdbcType="DECIMAL"
+			property="enCzValueIncmRate" />
+		<result column="EN_CZ_VALUE_NET_VALUE" jdbcType="DECIMAL"
+			property="enCzValueNetValue" />
+		<result column="EN_CZ_VALUE_ALL_VALUE" jdbcType="DECIMAL"
+			property="enCzValueAllValue" />
+		<result column="C_IS_STEP_MARKET" jdbcType="CHAR" property="cIsStepMarket" />
+		<result column="VC_STEP_MARKET_INTER_CODE" jdbcType="VARCHAR"
+			property="vcStepMarketInterCode" />
+		<result column="EN_EXCHANGE_CONVER_RATIO" jdbcType="DECIMAL"
+			property="enExchangeConverRatio" />
+		<result column="VC_EXCHANGE_PLEDGE_CODE" jdbcType="VARCHAR"
+			property="vcExchangePledgeCode" />
+		<result column="VC_PAYMENT_PLACE" jdbcType="VARCHAR" property="vcPaymentPlace" />
+		<result column="VC_LATEST_MAX_INVESTOR" jdbcType="VARCHAR"
+			property="vcLatestMaxInvestor" />
+		<result column="VC_TENDER_INTERVAL" jdbcType="VARCHAR"
+			property="vcTenderInterval" />
+		<result column="C_IS_HAVE_RIGHT" jdbcType="CHAR" property="cIsHaveRight" />
+		<result column="C_NEW_COP_BOND_TYPE" jdbcType="CHAR" property="cNewCopBondType" />
+		<result column="C_IS_SMALL" jdbcType="CHAR" property="cIsSmall" />
+		<result column="C_IS_CITY_BOND" jdbcType="CHAR" property="cIsCityBond" />
+		<result column="C_IS_SUBPRIME_BOND" jdbcType="CHAR" property="cIsSubprimeBond" />
+		<result column="C_IS_SECURED_BOND" jdbcType="CHAR" property="cIsSecuredBond" />
+		<result column="C_IS_SEPARETE_BOND" jdbcType="CHAR" property="cIsSepareteBond" />
+		<result column="C_IS_PERPETUAL_BOND" jdbcType="CHAR"
+			property="cIsPerpetualBond" />
+		<result column="C_IS_PRIVATE_BOND" jdbcType="CHAR" property="cIsPrivateBond" />
+		<result column="C_IS_SMALL_RAISED" jdbcType="CHAR" property="cIsSmallRaised" />
+		<result column="C_CITY_LEVEL" jdbcType="CHAR" property="cCityLevel" />
+		<result column="EN_TOTAL_STOCKS" jdbcType="DECIMAL" property="enTotalStocks" />
+		<result column="EN_CIRCULATION_STOCKS" jdbcType="DECIMAL"
+			property="enCirculationStocks" />
+		<result column="EN_LATEST_ISSUE" jdbcType="DECIMAL" property="enLatestIssue" />
+		<result column="EN_LATEST_TOTAL_STOCKS" jdbcType="DECIMAL"
+			property="enLatestTotalStocks" />
+		<result column="EN_LAST_PRICE_CLOSE" jdbcType="DECIMAL"
+			property="enLastPriceClose" />
+		<result column="L_FUND_SET_DAYS" jdbcType="DECIMAL" property="lFundSetDays" />
+		<result column="C_FUND_TYPE" jdbcType="CHAR" property="cFundType" />
+		<result column="VC_MORTGAGE_STK_CODE" jdbcType="VARCHAR"
+			property="vcMortgageStkCode" />
+		<result column="VC_MORTGAGE_STK_NAME" jdbcType="VARCHAR"
+			property="vcMortgageStkName" />
+		<result column="L_MORTGAGE_STK_AMOUNT" jdbcType="DECIMAL"
+			property="lMortgageStkAmount" />
+		<result column="L_NEXT_REPAY_DATE" jdbcType="DECIMAL" property="lNextRepayDate" />
+		<result column="L_NEXT_SALEBACK_DATE" jdbcType="DECIMAL"
+			property="lNextSalebackDate" />
+		<result column="L_NEXT_REDEEM_DATE" jdbcType="DECIMAL"
+			property="lNextRedeemDate" />
+		<result column="VC_GROUP_UNDERWRITER_ID" jdbcType="VARCHAR"
+			property="vcGroupUnderwriterId" />
+		<result column="C_IS_RAISE_BOND" jdbcType="CHAR" property="cIsRaiseBond" />
+		<result column="EN_VD01" jdbcType="DECIMAL" property="enVd01" />
+		<result column="C_ABS_TYPE" jdbcType="CHAR" property="cAbsType" />
+		<result column="C_MKTFUND_TYPE" jdbcType="CHAR" property="cMktfundType" />
+		<result column="C_STRUCTFUND_TYPE" jdbcType="CHAR" property="cStructfundType" />
+		<result column="C_STOCKSECT_TYPE" jdbcType="CHAR" property="cStocksectType" />
+		<result column="L_IS_PPN" jdbcType="CHAR" property="lIsPpn" />
+		<result column="C_STRUCTFUND_PERPETUALTYPE" jdbcType="CHAR"
+			property="cStructfundPerpetualtype" />
+		<result column="EN_CZ_VD01" jdbcType="DECIMAL" property="enCzVd01" />
+		<result column="CJDT" jdbcType="VARCHAR" property="cjdt" />
+		<result column="INSERTTIME" jdbcType="TIMESTAMP" property="inserttime" />
+	</resultMap>
+
+	<select id="selectDimInterCodes" resultType="java.lang.String">
+		${sql}
+	</select>
+
+	<select id="selectBuyBackInterCodes" resultType="com.cjhx.risk.o32scan.domain.FmThgInfo">
+		SELECT FMT.L_SERIAL_NO lSerialNo,
+		       FMT.L_FUND_ID lFundId,
+		       FMT.VC_INTER_CODE vcInterCode,
+		       (
+		            SELECT to_char(WM_CONCAT(FMTG.VC_INTER_CODE))
+		              FROM FM_THGMORTAGAGE FMTG
+		             WHERE FMTG.L_SERIAL_NO = FMT.L_SERIAL_NO
+		       ) vcInterCodes
+		  FROM FM_THGREGISTER FMT 
+		  <if test="tradeRivalIds != null and tradeRivalIds.size > 0 ">
+		  	   INNER JOIN FM_TBANKREALDEAL TBANK ON FMT.L_ENTRUST_SERIAL_NO = TBANK.L_ENTRUST_SERIAL_NO AND FMT.L_HG_DATE = TBANK.L_DATE
+		  	   INNER JOIN FM_TTRADERIVAL TRADE ON TBANK.L_TRADE_RIVAL_NO = TRADE.L_RIVAL_ID
+		  </if>
+		 WHERE FMT.L_FUND_ID IN
+		 		<foreach item="item" collection="fundIds" separator="," open="(" close=")" index="index">
+          			#{item}
+          		</foreach>
+		   AND FMT.C_ENTRUST_DIRECTION IN ('6','16') 
+		   AND FMT.L_HG_DATE = #{date}
+		  <if test="tradeRivalIds != null and tradeRivalIds.size > 0 ">
+		   AND FMT.L_HG_DATE = TBANK.L_DATE
+		   AND TRADE.C_RIVAL_TYPE IN 
+		  	   <foreach item="item" collection="tradeRivalIds" separator="," open="(" close=")" index="index">
+		  	   		#{item}
+		  	   </foreach>
+		  </if>
+		  UNION
+		  SELECT FMT.L_SERIAL_NO lSerialNo,
+		         FMT.L_FUND_ID lFundId,
+		         FMT.VC_INTER_CODE vcInterCode,
+		         (
+		              SELECT to_char(WM_CONCAT(FMTG.VC_INTER_CODE))
+		                FROM FM_THGMORTAGAGE FMTG
+		               WHERE FMTG.L_SERIAL_NO = FMT.L_SERIAL_NO
+		                 AND FMTG.L_DATE = FMT.L_DATE
+		         ) vcInterCodes
+		    FROM FM_THISHGREGISTER FMT 
+		    <if test="tradeRivalIds != null and tradeRivalIds.size > 0 ">
+		  	     INNER JOIN FM_TBANKREALDEAL TBANK ON FMT.L_ENTRUST_SERIAL_NO = TBANK.L_ENTRUST_SERIAL_NO AND FMT.L_HG_DATE = TBANK.L_DATE
+		  	     INNER JOIN FM_TTRADERIVAL TRADE ON TBANK.L_TRADE_RIVAL_NO = TRADE.L_RIVAL_ID
+		    </if>
+		   WHERE FMT.L_FUND_ID IN
+		   		<foreach item="item" collection="fundIds" separator="," open="(" close=")" index="index">
+          			#{item}
+          		</foreach>
+		     AND FMT.C_ENTRUST_DIRECTION IN ('6','16') 
+		     AND FMT.L_HG_DATE = #{date}
+		    <if test="tradeRivalIds != null and tradeRivalIds.size > 0 ">
+		     AND TRADE.C_RIVAL_TYPE IN 
+		  	     <foreach item="item" collection="tradeRivalIds" separator="," open="(" close=")" index="index">
+		  	   		#{item}
+		  	     </foreach>
+		    </if>
+	</select>
+
+	<select id="selectStockTotalSum" resultType="java.math.BigDecimal">
+		<foreach collection="denominatorItems" index="index" item="dItem" 
+					open="select nvl(sum(et.totalSum),0) from (" separator="union all" close=")et">
+			<if test='dItem.denominator == "4"'>
+				select sum(hs.en_total_stocks) as totalSum
+				from all_stock_info_his hs
+				where hs.l_date = #{scanDatabaseDate}
+				<if test='issuerId != null'>
+					and hs.l_issuer_id = #{issuerId}
+				</if>
+				<if test='interCode != null'>
+					and hs.vc_inter_code_o32 = #{interCode}
+				</if>
+			</if>
+			<if test='dItem.denominator == "5"'>
+				select sum(hs.en_circulation_stocks) as totalSum
+				from all_stock_info_his hs
+				where hs.l_date = #{scanDatabaseDate}
+				<if test='issuerId != null'>
+					and hs.l_issuer_id = #{issuerId}
+				</if>
+				<if test='interCode != null'>
+					and hs.vc_inter_code_o32 = #{interCode}
+				</if>
+			</if>
+			<if test='dItem.denominator != "4" and dItem.denominator != "5"'>
+				select 0 as totalSum from dual where 1=0	
+			</if>
+		</foreach>
+	</select>
+
+	<select id="selectEnTotalStocksAvg10" resultType="java.math.BigDecimal">
+		select sum(hs.EN_TOTAL_STOCKS_AVG10) as totalSum
+		from all_stock_info_his hs
+		where hs.l_date = #{scanDatabaseDate}
+		and hs.vc_inter_code_o32 in (${addInnercodeSql})
+		and hs.vc_inter_code_o32 not in (${subInnercodeSql})
+	</select>
+	
+</mapper>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.scan.dao.RcRuleItemMapper">
+	<resultMap id="BaseResultMap" type="com.cjhx.risk.scan.domain.RcRuleItem">
+		<id column="RULE_ID" jdbcType="CHAR" property="ruleId" />
+		<result column="RULE_NAME" jdbcType="VARCHAR" property="ruleName" />
+		<result column="START_DATE" jdbcType="TIMESTAMP" property="startDate" />
+		<result column="END_DATE" jdbcType="TIMESTAMP" property="endDate" />
+		<result column="STEP" jdbcType="VARCHAR" property="step" />
+		<result column="STATUS" jdbcType="CHAR" property="status" />
+		<result column="RC_TYPE" jdbcType="CHAR" property="rcType" />
+		<result column="RC_LEVEL" jdbcType="CHAR" property="rcLevel" />
+		<result column="PRIORITY" jdbcType="CHAR" property="priority" />
+		<result column="NUMERATOR_TYPE" jdbcType="CHAR" property="numeratorType" />
+		<result column="SUMMARY_TYPE" jdbcType="CHAR" property="summaryType" />
+		<result column="OPERATOR" jdbcType="CHAR" property="operator" />
+		<result column="THRESHOLD_VALUE0" jdbcType="DECIMAL" property="thresholdValue0" />
+		<result column="THRESHOLD_VALUE1" jdbcType="DECIMAL" property="thresholdValue1" />
+		<result column="THRESHOLD_VALUE2" jdbcType="DECIMAL" property="thresholdValue2" />
+		<result column="PRE_LOG_NO_RISK" jdbcType="CHAR" property="preLogNoRisk" />
+		<result column="PRE_WARNNING_ACTION" jdbcType="CHAR"
+			property="preWarnningAction" />
+		<result column="ON_START_TIME" jdbcType="TIMESTAMP" property="onStartTime" />
+		<result column="ON_END_TIME" jdbcType="TIMESTAMP" property="onEndTime" />
+		<result column="ON_GAP" jdbcType="DECIMAL" property="onGap" />
+		<result column="ON_MAX_REMIND" jdbcType="DECIMAL" property="onMaxRemind" />
+		<result column="ON_REMIND_WAY" jdbcType="CHAR" property="onRemindWay" />
+		<result column="AFTER_NO_REMIND_DAYS" jdbcType="DECIMAL"
+			property="afterNoRemindDays" />
+		<result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="RECHECKED" jdbcType="CHAR" property="rechecked" />
+		<result column="MODIFY_USER" jdbcType="VARCHAR" property="modifyUser" />
+		<result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+		<result column="REMARK" jdbcType="VARCHAR" property="remark" />
+		<result column="OUT_CONTROL_REASON" jdbcType="VARCHAR"
+			property="outControlReason" />
+		<result column="PRE_TIME" jdbcType="VARCHAR" property="preTime" />
+		<result column="IS_FOR_ALL_THRESHOLD" jdbcType="CHAR"
+			property="isForAllThreshold" />
+		<result column="ITEM_STATUS" jdbcType="CHAR" property="itemStatus" />
+		<result column="RECHECK_USER" jdbcType="VARCHAR" property="recheckUser" />
+		<result column="RECHECK_TIME" jdbcType="TIMESTAMP" property="recheckTime" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		RULE_ID, RULE_NAME, START_DATE, END_DATE, STEP, STATUS, RC_TYPE, RC_LEVEL,
+		PRIORITY,
+		NUMERATOR_TYPE, SUMMARY_TYPE, OPERATOR, THRESHOLD_VALUE0, THRESHOLD_VALUE1,
+		THRESHOLD_VALUE2,
+		PRE_LOG_NO_RISK, PRE_WARNNING_ACTION, ON_START_TIME, ON_END_TIME, ON_GAP,
+		ON_MAX_REMIND,
+		ON_REMIND_WAY, AFTER_NO_REMIND_DAYS, CREATE_USER, CREATE_TIME, RECHECKED,
+		MODIFY_USER,
+		MODIFY_TIME, REMARK, OUT_CONTROL_REASON, PRE_TIME, IS_FOR_ALL_THRESHOLD,
+		ITEM_STATUS,
+		RECHECK_USER, RECHECK_TIME
+	</sql>
+	
+	<select id="selectTradeRivalId" resultType="java.lang.String">
+		SELECT TO_CHAR(RITEM.CHAR_VALUE)
+		  FROM RC_RULE_ITEM_CHAR_VALUE RITEM 
+		 WHERE RITEM.RULE_ID = #{ruleId}
+		   AND RITEM.CHAR_CODE = 'special_rule_buyback_collateral_restrictio_trade_rival'
+	</select>
+	
+	<select id="selectDimsByRuleId" resultType="java.lang.String">
+		SELECT TO_CHAR(DYN.DIM_VALUE)
+		  FROM RC_DYN_DIMENSION DYN
+		       INNER JOIN RC_RULE_ITEM_CHAR_VALUE RITEM ON DYN.DIM_ID = TO_CHAR (RITEM.CHAR_VALUE)
+		 WHERE RITEM.RULE_ID = #{ruleId}
+		   AND RITEM.CHAR_CODE = 'special_rule_remaining_maturity_value2'
+	</select>
+	
+	
+	<select id="selectByPrimaryKey" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from RC_RULE_ITEM
+		where RULE_ID = #{ruleId,jdbcType=CHAR}
+	</select>
+	
+	<select id="selectAfterwardsRcRuleItem" resultType="com.cjhx.risk.scan.domain.RcRuleItem">
+		SELECT  i.RULE_ID ruleId, 
+		        i.RULE_NAME ruleName, 
+		        i.START_DATE startDate, 
+		        i.END_DATE endDate,  
+		        i.RC_TYPE rcType, 
+				nuv.domain_value numeratorType, 
+				rdv.domain_value summaryType,
+				trim(i.OPERATOR) operator, 
+				i.THRESHOLD_VALUE0 thresholdValue0, 
+				i.THRESHOLD_VALUE1 thresholdValue1,
+				i.THRESHOLD_VALUE2 thresholdValue2, 
+				i.PRE_LOG_NO_RISK preLogNoRisk, 
+				i.PRE_WARNNING_ACTION preWarnningAction, 
+				i.AFTER_NO_REMIND_DAYS afterNoRemindDays, 
+				i.PRE_TIME preTime, 
+				i.IS_FOR_ALL_THRESHOLD isForAllThreshold,
+				(
+					SELECT TO_CHAR(v.CHAR_VALUE)
+					  FROM RC_RULE_ITEM_CHAR_VALUE v
+					 WHERE v.CHAR_CODE = 'special_rule_type'
+					   AND v.RULE_ID = i.RULE_ID
+				) specialType,
+				(
+					SELECT TO_CHAR(v.CHAR_VALUE)
+					  FROM RC_RULE_ITEM_CHAR_VALUE v
+					 WHERE v.CHAR_CODE = 'reverseBuyBack_pledgeRate_monitor_value1'
+					   AND v.RULE_ID = i.RULE_ID
+				) rmv1,
+				(
+					SELECT TO_CHAR(v.CHAR_VALUE)
+					  FROM RC_RULE_ITEM_CHAR_VALUE v
+					 WHERE v.CHAR_CODE = 'reverseBuyBack_pledgeRate_monitor_value2'
+					   AND v.RULE_ID = i.RULE_ID
+				) rmv2,
+				(
+					SELECT TO_CHAR(v.CHAR_VALUE)
+					  FROM RC_RULE_ITEM_CHAR_VALUE v
+					 WHERE v.CHAR_CODE = 'reverseBuyBack_pledgeRate_monitor_value3'
+					   AND v.RULE_ID = i.RULE_ID
+				) rmv3
+		  FROM  rc_rule_item i
+		        LEFT JOIN rc_domain_value rdv ON rdv.domain_id = 'restraint_summary_type' AND i.summary_type = rdv.domain_item_id
+		        LEFT JOIN rc_domain_value nuv ON nuv.domain_id = 'restraint_molecule_type' AND i.numerator_type = nuv.domain_item_id
+		 WHERE  (i.STATUS=0 or i.STATUS=1)
+		   AND  (((i.START_DATE <![CDATA[<=]]> SYSDATE and i.END_DATE >= SYSDATE) 
+				OR (i.START_DATE IS NULL AND i.END_DATE IS NULL)
+       			OR (i.END_DATE is null and i.START_DATE <![CDATA[<=]]> SYSDATE)
+       			OR (i.START_DATE is null and i.END_DATE >= SYSDATE ))
+       		    or i.RC_TYPE = '4')
+		   AND  instr(i.STEP,'3') <![CDATA[>]]> 0
+		   AND  i.ITEM_STATUS = '1'
+		   AND  EXISTS  (select 'X' 
+                     from rc_rule_production p,rc_domain_value v
+                     where p.control_level = v.domain_item_id
+                     and v.domain_value in ('1','2')
+                     and p.rule_id = i.rule_id)
+	  ORDER BY  i.RECHECK_TIME DESC
+	</select>
+	
+	<select id="selectFundIdsFromManageAndFundProd" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		(select distinct g.production_id as fundId
+        from rc_rule_production p,rc_domain_value v,rc_production_group_detail g
+        where p.control_level = v.domain_item_id
+        and v.domain_value = '1'
+        and p.production_code = g.production_group_id
+        and p.rule_id = #{ruleId})
+        union all
+        (select p.production_code as fundId 
+        from rc_rule_production p,rc_domain_value v
+        where p.control_level = v.domain_item_id
+        and v.domain_value = '2'
+        and p.rule_id = #{ruleId})
+	</select>
+	
+	<select id="selectAssetsIdsFromAssetsProd" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		select p.production_code
+        from rc_rule_production p,rc_domain_value v
+        where p.control_level = v.domain_item_id
+        and v.domain_value = '3'
+        and p.rule_id = #{ruleId}
+	</select>
+	
+	<select id="selectCombiCodesFromCombiProd" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		select p.production_code 
+        from rc_rule_production p,rc_domain_value v
+        where p.control_level = v.domain_item_id
+        and v.domain_value = '4'
+        and p.rule_id = #{ruleId}
+	</select>
+	
+	<select id="selectCharValueByCharCodeAndRuleId" resultType="java.lang.String">
+		select CHAR_VALUE 
+		from RC_RULE_ITEM_CHAR_VALUE
+		where CHAR_CODE = #{charCode}
+		and RULE_ID = #{ruleId}
+	</select>
+	
+	<select id="selectScanQuartzCronFromDomainValue" resultType="java.lang.String">
+		select DOMAIN_VALUE
+		from RC_DOMAIN_VALUE
+		where
+		DOMAIN_ID = 'scan_quartz_cron'
+	</select>
+		
+	<select id="selectScanDatabaseDayFromDomainValue" resultType="java.lang.String">
+		select DOMAIN_VALUE
+		from RC_DOMAIN_VALUE
+		where
+		DOMAIN_ID = 'scan_database_day'
+	</select>
+	
+	<select id="selectSingleScanQuartzCronFromDomainValue" resultType="java.lang.String">
+		select DOMAIN_VALUE
+		from RC_DOMAIN_VALUE
+		where
+		DOMAIN_ID = 'single_scan_quartz_cron'
+	</select>
+	
+	<select id="selectDenominatorItemFromRcRuleDenominator" 
+		parameterType="java.lang.String" resultType="com.cjhx.risk.scan.model.RuleDenominatorDto">
+		select n.OPEARTOR as opeartor,v.DOMAIN_VALUE as denominator
+		from RC_RULE_DENOMINATOR n,RC_DOMAIN_VALUE v
+		where n.RULE_ID = #{ruleId}
+		and n.DENOMINATOR_CATEGORY = '1'
+		and n.DENOMINATOR_ITEM	= v.DOMAIN_ITEM_ID
+	</select>
+	
+	<select id="selectRcRuleThresholdByFundId" resultType="com.cjhx.risk.scan.domain.RcRuleThreshold">
+		select t.PRODUCTION_ID as productionId,
+		t.THRESHOLD1 as threshold1, t.THRESHOLD2 as threshold2, t.THRESHOLD3 as threshold3, 
+		v1.DOMAIN_VALUE as warnningAction1, v2.DOMAIN_VALUE as warnningAction2, 
+		v3.DOMAIN_VALUE as warnningAction3
+		from RC_RULE_THRESHOLD t
+		left join RC_DOMAIN_VALUE v1 on v1.DOMAIN_ITEM_ID = t.WARNNING_ACTION1
+		left join RC_DOMAIN_VALUE v2 on v2.DOMAIN_ITEM_ID = t.WARNNING_ACTION2
+		left join RC_DOMAIN_VALUE v3 on v3.DOMAIN_ITEM_ID = t.WARNNING_ACTION3
+		where t.RULE_ID = #{ruleId}
+		<if test='summaryType == "0" or summaryType == "1" or summaryType == "2"'>
+			and (t.PRODUCTION_ID = 'ALL' or t.PRODUCTION_ID = #{fundId})
+		</if>
+		<if test='summaryType == "3" or summaryType == "4" or summaryType == "5"'>
+			and t.PRODUCTION_ID = 'ALL'
+		</if>
+	</select>
+	
+	<select id="selectNumeratorItemFromRcRuleNumerator" 
+		parameterType="java.lang.String" resultType="com.cjhx.risk.scan.domain.RcRuleNumerator">
+		select n.OPEARTOR as opeartor,v.DOMAIN_VALUE as numeratorItemLevel2
+		from RC_RULE_NUMERATOR n,RC_DOMAIN_VALUE v
+		where n.RULE_ID = #{ruleId}
+		and n.NUMERATOR_CATEGORY = '5'
+		and n.NUMERATOR_ITEM_LEVEL1	= v.DOMAIN_ITEM_ID
+	</select>
+	
+</mapper>

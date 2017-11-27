@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.scan.dao.RcScanMapper">
+	<resultMap id="BaseResultMap" type="com.cjhx.risk.scan.domain.RcScan">
+		<id column="SCAN_ID" jdbcType="CHAR" property="scanId" />
+		<result column="START_DATE" jdbcType="DECIMAL" property="startDate" />
+		<result column="START_TIME" jdbcType="DECIMAL" property="startTime" />
+		<result column="END_DATE" jdbcType="DECIMAL" property="endDate" />
+		<result column="END_TIME" jdbcType="DECIMAL" property="endTime" />
+		<result column="STATUS" jdbcType="CHAR" property="status" />
+		<result column="SEQUENCE" jdbcType="DECIMAL" property="sequence" />
+		<result column="SOURCE" jdbcType="CHAR" property="source" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		SCAN_ID, START_DATE, START_TIME, END_DATE, END_TIME, STATUS, SEQUENCE, SOURCE
+	</sql>
+	<select id="getScanSeqId" resultType="java.lang.String">
+		select LPAD(TO_CHAR(SEQ_RC_SCAN.NEXTVAL),20,'0') from dual
+	</select>
+	
+	<select id="selectByPrimaryKey" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from RC_SCAN
+		where SCAN_ID = #{scanId,jdbcType=CHAR}
+	</select>
+	
+	<select id="selectWaitingScanTask" resultType="java.lang.String">
+		select SCAN_ID
+		from RC_SCAN
+		where STATUS = 'P'
+	</select>
+
+	<select id="validateRunningScan" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(*)
+		from RC_SCAN
+		where STATUS = 'R'
+		and SEQUENCE <![CDATA[<]]> (select SEQUENCE from RC_SCAN
+		 							where SCAN_ID = #{scanId})
+		or STATUS = 'P'
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from RC_SCAN
+		where SCAN_ID = #{scanId,jdbcType=CHAR}
+	</delete>
+	<insert id="insert" parameterType="com.cjhx.risk.scan.domain.RcScan">
+		insert into RC_SCAN (SCAN_ID, START_DATE, START_TIME,
+		END_DATE, END_TIME, STATUS,
+		SEQUENCE, SOURCE)
+		values (#{scanId,jdbcType=CHAR}, #{startDate,jdbcType=DECIMAL},
+		#{startTime,jdbcType=DECIMAL},
+		#{endDate,jdbcType=DECIMAL}, #{endTime,jdbcType=DECIMAL}, #{status,jdbcType=CHAR},
+		#{sequence,jdbcType=DECIMAL}, #{source,jdbcType=CHAR})
+	</insert>
+	<insert id="insertRcScanSelective" parameterType="com.cjhx.risk.scan.domain.RcScan">
+		insert into RC_SCAN
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="scanId != null">
+				SCAN_ID,
+			</if>
+			<if test="startDate != null">
+				START_DATE,
+			</if>
+			<if test="startTime != null">
+				START_TIME,
+			</if>
+			<if test="endDate != null">
+				END_DATE,
+			</if>
+			<if test="endTime != null">
+				END_TIME,
+			</if>
+			<if test="status != null">
+				STATUS,
+			</if>
+			SEQUENCE,
+			<if test="source != null">
+				SOURCE,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="scanId != null">
+				#{scanId,jdbcType=CHAR},
+			</if>
+			<if test="startDate != null">
+				#{startDate,jdbcType=DECIMAL},
+			</if>
+			<if test="startTime != null">
+				#{startTime,jdbcType=DECIMAL},
+			</if>
+			<if test="endDate != null">
+				#{endDate,jdbcType=DECIMAL},
+			</if>
+			<if test="endTime != null">
+				#{endTime,jdbcType=DECIMAL},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=CHAR},
+			</if>
+			((select nvl(max(SEQUENCE),0) from RC_SCAN)+1),
+			<if test="source != null">
+				#{source,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateRcScanByScanIdSelective" parameterType="com.cjhx.risk.scan.domain.RcScan">
+		update RC_SCAN
+		<set>
+			<if test="startDate != null">
+				START_DATE = #{startDate,jdbcType=DECIMAL},
+			</if>
+			<if test="startTime != null">
+				START_TIME = #{startTime,jdbcType=DECIMAL},
+			</if>
+			<if test="endDate != null">
+				END_DATE = #{endDate,jdbcType=DECIMAL},
+			</if>
+			<if test="endTime != null">
+				END_TIME = #{endTime,jdbcType=DECIMAL},
+			</if>
+			<if test="status != null">
+				STATUS = #{status,jdbcType=CHAR},
+			</if>
+			<if test="sequence != null">
+				SEQUENCE = #{sequence,jdbcType=DECIMAL},
+			</if>
+			<if test="source != null">
+				SOURCE = #{source,jdbcType=CHAR},
+			</if>
+		</set>
+		where SCAN_ID = #{scanId,jdbcType=CHAR}
+	</update>
+	
+	<update id="updateRcScanByScanIdAndWaitingStatusSelective" parameterType="com.cjhx.risk.scan.domain.RcScan">
+		update RC_SCAN
+		<set>
+			<if test="startDate != null">
+				START_DATE = #{startDate,jdbcType=DECIMAL},
+			</if>
+			<if test="startTime != null">
+				START_TIME = #{startTime,jdbcType=DECIMAL},
+			</if>
+			<if test="endDate != null">
+				END_DATE = #{endDate,jdbcType=DECIMAL},
+			</if>
+			<if test="endTime != null">
+				END_TIME = #{endTime,jdbcType=DECIMAL},
+			</if>
+			<if test="status != null">
+				STATUS = #{status,jdbcType=CHAR},
+			</if>
+			SEQUENCE = ((select nvl(max(SEQUENCE),0) from RC_SCAN)+1),
+			<if test="source != null">
+				SOURCE = #{source,jdbcType=CHAR},
+			</if>
+		</set>
+		where SCAN_ID = #{scanId,jdbcType=CHAR}
+		and STATUS = 'P'
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.cjhx.risk.scan.domain.RcScan">
+		update RC_SCAN
+		set START_DATE = #{startDate,jdbcType=DECIMAL},
+		START_TIME = #{startTime,jdbcType=DECIMAL},
+		END_DATE = #{endDate,jdbcType=DECIMAL},
+		END_TIME = #{endTime,jdbcType=DECIMAL},
+		STATUS = #{status,jdbcType=CHAR},
+		SEQUENCE = #{sequence,jdbcType=DECIMAL},
+		SOURCE = #{source,jdbcType=CHAR}
+		where SCAN_ID = #{scanId,jdbcType=CHAR}
+	</update>
+	
+</mapper>

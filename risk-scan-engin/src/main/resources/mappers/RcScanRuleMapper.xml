@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.scan.dao.RcScanRuleMapper">
+	<resultMap id="BaseResultMap" type="com.cjhx.risk.scan.domain.RcScanRule">
+		<id column="SCAN_RULE_ID" jdbcType="CHAR" property="scanRuleId" />
+		<result column="SCAN_ID" jdbcType="CHAR" property="scanId" />
+		<result column="RULE_ID" jdbcType="CHAR" property="ruleId" />
+		<result column="RULE_NAME" jdbcType="VARCHAR" property="ruleName" />
+		<result column="PRODUCTION_ID" jdbcType="VARCHAR" property="productionId" />
+		<result column="PRODUCTION_NAME" jdbcType="VARCHAR" property="productionName" />
+		<result column="PRODUCTION_TYPE" jdbcType="CHAR" property="productionType" />
+		<result column="CHECK_RESULT" jdbcType="CHAR" property="checkResult" />
+		<result column="SUMMARY_TYPE" jdbcType="CHAR" property="summaryType" />
+		<result column="CREATE_DATE" jdbcType="DECIMAL" property="createDate" />
+		<result column="CREATE_TIME" jdbcType="DECIMAL" property="createTime" />
+		<result column="COMPUTE_VALUE" jdbcType="VARCHAR" property="computeValue" />
+		<result column="SET_VALUE" jdbcType="VARCHAR" property="setValue" />
+		<result column="REAL_VALUE" jdbcType="VARCHAR" property="realValue" />
+		<result column="COMUPTE_DATE" jdbcType="DECIMAL" property="comupteDate" />
+		<result column="COMPUTE_TIME" jdbcType="DECIMAL" property="computeTime" />
+		<result column="START_DATE" jdbcType="DECIMAL" property="startDate" />
+		<result column="START_TIME" jdbcType="DECIMAL" property="startTime" />
+		<result column="END_DATE" jdbcType="DECIMAL" property="endDate" />
+		<result column="END_TIME" jdbcType="DECIMAL" property="endTime" />
+		<result column="RISK_ACCMULATION" jdbcType="DECIMAL" property="riskAccmulation" />
+		<result column="RISK_COMMENTS" jdbcType="VARCHAR" property="riskComments" />
+		<result column="REMARK" jdbcType="VARCHAR" property="remark" />
+		<result column="STATUS" jdbcType="CHAR" property="status" />
+	</resultMap>
+	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs"
+		type="com.cjhx.risk.scan.domain.RcScanRule">
+		<result column="ERROR_LOG" jdbcType="CLOB" property="errorLog" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		SCAN_RULE_ID, SCAN_ID, RULE_ID, RULE_NAME, PRODUCTION_ID, PRODUCTION_NAME,
+		PRODUCTION_TYPE,
+		CHECK_RESULT, SUMMARY_TYPE, CREATE_DATE, CREATE_TIME, COMPUTE_VALUE, SET_VALUE,
+		REAL_VALUE, COMUPTE_DATE, COMPUTE_TIME, START_DATE, START_TIME,
+		END_DATE, END_TIME, RISK_ACCMULATION, RISK_COMMENTS, REMARK, STATUS
+	</sql>
+	<sql id="Blob_Column_List">
+		ERROR_LOG
+	</sql>
+
+	<select id="getScanSeqId" resultType="java.lang.String">
+		select LPAD(TO_CHAR(SEQ_RC_SCAN_RULE.NEXTVAL),20,'0') from dual
+	</select>
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.String"
+		resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from RC_SCAN_RULE
+		where SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR}
+	</select>
+		
+	<select id="selectRiskCommentsOfTheDayBefore"
+	resultType="com.cjhx.risk.scan.domain.RcScanRule">
+		with scan_id_tb as
+		  (select temp.scanId,temp.startDate from (
+		    select row_number() over(order by s.sequence desc) as rnum, 
+		    s.scan_id as scanId,s.start_date as startDate
+		    from rc_scan s
+		    where s.status = 'C'
+		    and s.sequence <![CDATA[<]]> (select s.sequence from rc_scan s where s.scan_id = #{scanRule.scanId})
+		  )temp
+		  where temp.rnum = ${rowNum})
+	
+		select (select startDate from scan_id_tb) as comupteDate,
+			db.RISK_COMMENTS as riskComments, db.status as status
+		from RC_SCAN_RULE db
+		where (db.status = '1' or db.status = '0' and db.check_result in ('1','2','3'))
+		and db.scan_id = (select scanId from scan_id_tb)
+        and db.scan_rule_id in (select r.scan_rule_id from rc_scan_rule r 
+		                        where r.scan_id = (select scanId from scan_id_tb))
+        and db.RULE_ID = #{scanRule.ruleId}
+        <if test='scanRule.summaryType == null or scanRule.summaryType == "0" 
+        	or scanRule.summaryType == "1" or scanRule.summaryType == "2"'>
+			and db.PRODUCTION_ID = #{scanRule.productionId}
+	        and db.PRODUCTION_TYPE = #{scanRule.productionType}
+		</if>
+        and db.SUMMARY_TYPE = #{scanRule.summaryType}
+	</select>
+	
+	<select id="selectComuptedRcScanRuleListByScanId" parameterType="java.lang.String"
+		resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		from RC_SCAN_RULE
+		where SCAN_ID = #{scanId}
+		and STATUS = '0'
+	</select>
+	
+	<select id="selectRiskAccmulationAndRiskCommentsOfTheDayBefore" resultType="com.cjhx.risk.scan.domain.RcScanRule">
+		with scan_id_tb as
+		  (select temp.scanId,temp.startDate from (
+		    select row_number() over(order by s.sequence desc) as rnum, 
+		    s.scan_id as scanId,s.start_date as startDate
+		    from rc_scan s
+		    where s.status = 'C'
+		    and s.sequence <![CDATA[<]]> (select s.sequence from rc_scan s where s.scan_id = #{scanRule.scanId})
+		  )temp
+		  where temp.rnum = ${rowNum})
+		
+		select (select startDate from scan_id_tb) as comupteDate,
+		       db.risk_accmulation as riskAccmulation,
+		       db.RISK_COMMENTS as riskComments,
+		       db.status as status
+		from rc_scan_rule db
+		where (db.status = '1' or db.status = '0' and db.check_result in ('1','2','3'))
+		and db.scan_id = (select scanId from scan_id_tb)
+		and db.rule_id = #{scanRule.ruleId}
+		and db.summary_type = #{scanRule.summaryType}
+		<if test='scanRule.summaryType == null or scanRule.summaryType == "0" 
+        	or scanRule.summaryType == "1" or scanRule.summaryType == "2"'>
+			and db.PRODUCTION_ID = #{scanRule.productionId}
+	        and db.PRODUCTION_TYPE = #{scanRule.productionType}
+		</if>
+		and db.scan_rule_id = #{scanRule.scanRuleId}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from RC_SCAN_RULE
+		where SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR}
+	</delete>
+	<insert id="insert" parameterType="com.cjhx.risk.scan.domain.RcScanRule">
+		insert into RC_SCAN_RULE (SCAN_RULE_ID, SCAN_ID, RULE_ID,
+		RULE_NAME, PRODUCTION_ID, PRODUCTION_NAME,
+		PRODUCTION_TYPE, CHECK_RESULT, SUMMARY_TYPE,
+		CREATE_DATE, CREATE_TIME, COMPUTE_VALUE,
+		SET_VALUE, REAL_VALUE, COMUPTE_DATE,
+		COMPUTE_TIME, RISK_ACCMULATION, RISK_COMMENTS,
+		REMARK, STATUS, ERROR_LOG)
+		values (#{scanRuleId,jdbcType=CHAR}, #{scanId,jdbcType=CHAR},
+		#{ruleId,jdbcType=CHAR},
+		#{ruleName,jdbcType=VARCHAR}, #{productionId,jdbcType=VARCHAR}, #{productionName,jdbcType=VARCHAR},
+		#{productionType,jdbcType=CHAR}, #{checkResult,jdbcType=CHAR},
+		#{summaryType,jdbcType=CHAR},
+		#{createDate,jdbcType=DECIMAL}, #{createTime,jdbcType=DECIMAL}, #{computeValue,jdbcType=VARCHAR},
+		#{setValue,jdbcType=VARCHAR}, #{realValue,jdbcType=VARCHAR},
+		#{comupteDate,jdbcType=DECIMAL},
+		#{computeTime,jdbcType=DECIMAL}, #{riskAccmulation,jdbcType=DECIMAL},
+		#{riskComments,jdbcType=VARCHAR},
+		#{remark,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, #{errorLog,jdbcType=CLOB})
+	</insert>
+	<insert id="insertRcScanRuleSelective" parameterType="com.cjhx.risk.scan.domain.RcScanRule">
+		insert into RC_SCAN_RULE
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="scanRuleId != null">
+				SCAN_RULE_ID,
+			</if>
+			<if test="scanId != null">
+				SCAN_ID,
+			</if>
+			<if test="ruleId != null">
+				RULE_ID,
+			</if>
+			<if test="ruleName != null">
+				RULE_NAME,
+			</if>
+			<if test="productionId != null">
+				PRODUCTION_ID,
+			</if>
+			<if test="productionName != null">
+				PRODUCTION_NAME,
+			</if>
+			<if test="productionType != null">
+				PRODUCTION_TYPE,
+			</if>
+			<if test="checkResult != null">
+				CHECK_RESULT,
+			</if>
+			<if test="summaryType != null">
+				SUMMARY_TYPE,
+			</if>
+			<if test="createDate != null">
+				CREATE_DATE,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="computeValue != null">
+				COMPUTE_VALUE,
+			</if>
+			<if test="setValue != null">
+				SET_VALUE,
+			</if>
+			<if test="realValue != null">
+				REAL_VALUE,
+			</if>
+			<if test="comupteDate != null">
+				COMUPTE_DATE,
+			</if>
+			<if test="computeTime != null">
+				COMPUTE_TIME,
+			</if>
+			<if test="startDate != null">
+				START_DATE,
+			</if>
+			<if test="startTime != null">
+				START_TIME,
+			</if>
+			<if test="endDate != null">
+				END_DATE,
+			</if>
+			<if test="endTime != null">
+				END_TIME,
+			</if>
+			<if test="riskAccmulation != null">
+				RISK_ACCMULATION,
+			</if>
+			<if test="riskComments != null">
+				RISK_COMMENTS,
+			</if>
+			<if test="remark != null">
+				REMARK,
+			</if>
+			<if test="status != null">
+				STATUS,
+			</if>
+			<if test="errorLog != null">
+				ERROR_LOG,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="scanRuleId != null">
+				#{scanRuleId,jdbcType=CHAR},
+			</if>
+			<if test="scanId != null">
+				#{scanId,jdbcType=CHAR},
+			</if>
+			<if test="ruleId != null">
+				#{ruleId,jdbcType=CHAR},
+			</if>
+			<if test="ruleName != null">
+				#{ruleName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionId != null">
+				#{productionId,jdbcType=VARCHAR},
+			</if>
+			<if test="productionName != null">
+				#{productionName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionType != null">
+				#{productionType,jdbcType=CHAR},
+			</if>
+			<if test="checkResult != null">
+				#{checkResult,jdbcType=CHAR},
+			</if>
+			<if test="summaryType != null">
+				#{summaryType,jdbcType=CHAR},
+			</if>
+			<if test="createDate != null">
+				#{createDate,jdbcType=DECIMAL},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=DECIMAL},
+			</if>
+			<if test="computeValue != null">
+				#{computeValue,jdbcType=VARCHAR},
+			</if>
+			<if test="setValue != null">
+				#{setValue,jdbcType=VARCHAR},
+			</if>
+			<if test="realValue != null">
+				#{realValue,jdbcType=VARCHAR},
+			</if>
+			<if test="comupteDate != null">
+				#{comupteDate,jdbcType=DECIMAL},
+			</if>
+			<if test="computeTime != null">
+				#{computeTime,jdbcType=DECIMAL},
+			</if>
+			<if test="startDate != null">
+				#{startDate,jdbcType=DECIMAL},
+			</if>
+			<if test="startTime != null">
+				#{startTime,jdbcType=DECIMAL},
+			</if>
+			<if test="endDate != null">
+				#{endDate,jdbcType=DECIMAL},
+			</if>
+			<if test="endTime != null">
+				#{endTime,jdbcType=DECIMAL},
+			</if>
+			<if test="riskAccmulation != null">
+				#{riskAccmulation,jdbcType=DECIMAL},
+			</if>
+			<if test="riskComments != null">
+				#{riskComments,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=CHAR},
+			</if>
+			<if test="errorLog != null">
+				#{errorLog,jdbcType=CLOB},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateRcScanRuleByScanRuleIdSelective" parameterType="com.cjhx.risk.scan.domain.RcScanRule">
+		update RC_SCAN_RULE
+		<set>
+			<if test="scanId != null">
+				SCAN_ID = #{scanId,jdbcType=CHAR},
+			</if>
+			<if test="ruleId != null">
+				RULE_ID = #{ruleId,jdbcType=CHAR},
+			</if>
+			<if test="ruleName != null">
+				RULE_NAME = #{ruleName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionId != null">
+				PRODUCTION_ID = #{productionId,jdbcType=VARCHAR},
+			</if>
+			<if test="productionName != null">
+				PRODUCTION_NAME = #{productionName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionType != null">
+				PRODUCTION_TYPE = #{productionType,jdbcType=CHAR},
+			</if>
+			<if test="checkResult != null">
+				CHECK_RESULT = #{checkResult,jdbcType=CHAR},
+			</if>
+			<if test="summaryType != null">
+				SUMMARY_TYPE = #{summaryType,jdbcType=CHAR},
+			</if>
+			<if test="createDate != null">
+				CREATE_DATE = #{createDate,jdbcType=DECIMAL},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=DECIMAL},
+			</if>
+			<if test="computeValue != null">
+				COMPUTE_VALUE = #{computeValue,jdbcType=VARCHAR},
+			</if>
+			<if test="setValue != null">
+				SET_VALUE = #{setValue,jdbcType=VARCHAR},
+			</if>
+			<if test="realValue != null">
+				REAL_VALUE = #{realValue,jdbcType=VARCHAR},
+			</if>
+			<if test="comupteDate != null">
+				COMUPTE_DATE = #{comupteDate,jdbcType=DECIMAL},
+			</if>
+			<if test="computeTime != null">
+				COMPUTE_TIME = #{computeTime,jdbcType=DECIMAL},
+			</if>
+			<if test="startDate != null">
+				START_DATE = #{startDate,jdbcType=DECIMAL},
+			</if>
+			<if test="startTime != null">
+				START_TIME = #{startTime,jdbcType=DECIMAL},
+			</if>
+			<if test="endDate != null">
+				END_DATE = #{endDate,jdbcType=DECIMAL},
+			</if>
+			<if test="endTime != null">
+				END_TIME = #{endTime,jdbcType=DECIMAL},
+			</if>
+			<if test="riskAccmulation != null">
+				RISK_ACCMULATION = #{riskAccmulation,jdbcType=DECIMAL},
+			</if>
+			<if test="riskComments != null">
+				RISK_COMMENTS = #{riskComments,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				STATUS = #{status,jdbcType=CHAR},
+			</if>
+			<if test="errorLog != null">
+				ERROR_LOG = #{errorLog,jdbcType=CLOB},
+			</if>
+		</set>
+		where SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR}
+	</update>
+	<update id="updateByPrimaryKeyWithBLOBs" parameterType="com.cjhx.risk.scan.domain.RcScanRule">
+		update RC_SCAN_RULE
+		set SCAN_ID = #{scanId,jdbcType=CHAR},
+		RULE_ID = #{ruleId,jdbcType=CHAR},
+		RULE_NAME = #{ruleName,jdbcType=VARCHAR},
+		PRODUCTION_ID = #{productionId,jdbcType=VARCHAR},
+		PRODUCTION_NAME = #{productionName,jdbcType=VARCHAR},
+		PRODUCTION_TYPE = #{productionType,jdbcType=CHAR},
+		CHECK_RESULT = #{checkResult,jdbcType=CHAR},
+		SUMMARY_TYPE = #{summaryType,jdbcType=CHAR},
+		CREATE_DATE = #{createDate,jdbcType=DECIMAL},
+		CREATE_TIME = #{createTime,jdbcType=DECIMAL},
+		COMPUTE_VALUE = #{computeValue,jdbcType=VARCHAR},
+		SET_VALUE = #{setValue,jdbcType=VARCHAR},
+		REAL_VALUE = #{realValue,jdbcType=VARCHAR},
+		COMUPTE_DATE = #{comupteDate,jdbcType=DECIMAL},
+		COMPUTE_TIME = #{computeTime,jdbcType=DECIMAL},
+		RISK_ACCMULATION = #{riskAccmulation,jdbcType=DECIMAL},
+		RISK_COMMENTS = #{riskComments,jdbcType=VARCHAR},
+		REMARK = #{remark,jdbcType=VARCHAR},
+		STATUS = #{status,jdbcType=CHAR},
+		ERROR_LOG = #{errorLog,jdbcType=CLOB}
+		where SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.cjhx.risk.scan.domain.RcScanRule">
+		update RC_SCAN_RULE
+		set SCAN_ID = #{scanId,jdbcType=CHAR},
+		RULE_ID = #{ruleId,jdbcType=CHAR},
+		RULE_NAME = #{ruleName,jdbcType=VARCHAR},
+		PRODUCTION_ID = #{productionId,jdbcType=VARCHAR},
+		PRODUCTION_NAME = #{productionName,jdbcType=VARCHAR},
+		PRODUCTION_TYPE = #{productionType,jdbcType=CHAR},
+		CHECK_RESULT = #{checkResult,jdbcType=CHAR},
+		SUMMARY_TYPE = #{summaryType,jdbcType=CHAR},
+		CREATE_DATE = #{createDate,jdbcType=DECIMAL},
+		CREATE_TIME = #{createTime,jdbcType=DECIMAL},
+		COMPUTE_VALUE = #{computeValue,jdbcType=VARCHAR},
+		SET_VALUE = #{setValue,jdbcType=VARCHAR},
+		REAL_VALUE = #{realValue,jdbcType=VARCHAR},
+		COMUPTE_DATE = #{comupteDate,jdbcType=DECIMAL},
+		COMPUTE_TIME = #{computeTime,jdbcType=DECIMAL},
+		RISK_ACCMULATION = #{riskAccmulation,jdbcType=DECIMAL},
+		RISK_COMMENTS = #{riskComments,jdbcType=VARCHAR},
+		REMARK = #{remark,jdbcType=VARCHAR},
+		STATUS = #{status,jdbcType=CHAR}
+		where SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR}
+	</update>
+</mapper>

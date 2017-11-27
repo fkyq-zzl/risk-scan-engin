@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.scan.dao.RcScanRuleDetail4StockMapper">
+	<resultMap id="BaseResultMap"
+		type="com.cjhx.risk.scan.domain.RcScanRuleDetail4Stock">
+		<result column="SCAN_RULE_DETAIL_ID" jdbcType="CHAR"
+			property="scanRuleDetailId" />
+		<result column="PRODUCTION_ID" jdbcType="VARCHAR" property="productionId" />
+		<result column="PRODUCTION_NAME" jdbcType="VARCHAR" property="productionName" />
+		<result column="PRODUCTION_TYPE" jdbcType="CHAR" property="productionType" />
+		<result column="STOCK_ID" jdbcType="VARCHAR" property="stockId" />
+		<result column="STOCK_NAME" jdbcType="VARCHAR" property="stockName" />
+		<result column="COMPUTE_VALUE" jdbcType="VARCHAR" property="computeValue" />
+		<result column="COMUPTE_DATE" jdbcType="DECIMAL" property="comupteDate" />
+		<result column="COMPUTE_TIME" jdbcType="DECIMAL" property="computeTime" />
+	</resultMap>
+	<insert id="insert" parameterType="com.cjhx.risk.scan.domain.RcScanRuleDetail4Stock">
+		insert into RC_SCAN_RULE_DETAIL_4_STOCK (SCAN_RULE_DETAIL_ID, PRODUCTION_ID,
+		PRODUCTION_NAME,
+		PRODUCTION_TYPE, STOCK_ID, STOCK_NAME,
+		COMPUTE_VALUE, COMUPTE_DATE, COMPUTE_TIME
+		)
+		values (#{scanRuleDetailId,jdbcType=CHAR}, #{productionId,jdbcType=VARCHAR},
+		#{productionName,jdbcType=VARCHAR},
+		#{productionType,jdbcType=CHAR}, #{stockId,jdbcType=VARCHAR}, #{stockName,jdbcType=VARCHAR},
+		#{computeValue,jdbcType=VARCHAR}, #{comupteDate,jdbcType=DECIMAL},
+		#{computeTime,jdbcType=DECIMAL}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.cjhx.risk.scan.domain.RcScanRuleDetail4Stock">
+		insert into RC_SCAN_RULE_DETAIL_4_STOCK
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="scanRuleDetailId != null">
+				SCAN_RULE_DETAIL_ID,
+			</if>
+			<if test="productionId != null">
+				PRODUCTION_ID,
+			</if>
+			<if test="productionName != null">
+				PRODUCTION_NAME,
+			</if>
+			<if test="productionType != null">
+				PRODUCTION_TYPE,
+			</if>
+			<if test="stockId != null">
+				STOCK_ID,
+			</if>
+			<if test="stockName != null">
+				STOCK_NAME,
+			</if>
+			<if test="computeValue != null">
+				COMPUTE_VALUE,
+			</if>
+			<if test="comupteDate != null">
+				COMUPTE_DATE,
+			</if>
+			<if test="computeTime != null">
+				COMPUTE_TIME,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="scanRuleDetailId != null">
+				#{scanRuleDetailId,jdbcType=CHAR},
+			</if>
+			<if test="productionId != null">
+				#{productionId,jdbcType=VARCHAR},
+			</if>
+			<if test="productionName != null">
+				#{productionName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionType != null">
+				#{productionType,jdbcType=CHAR},
+			</if>
+			<if test="stockId != null">
+				#{stockId,jdbcType=VARCHAR},
+			</if>
+			<if test="stockName != null">
+				#{stockName,jdbcType=VARCHAR},
+			</if>
+			<if test="computeValue != null">
+				#{computeValue,jdbcType=VARCHAR},
+			</if>
+			<if test="comupteDate != null">
+				#{comupteDate,jdbcType=DECIMAL},
+			</if>
+			<if test="computeTime != null">
+				#{computeTime,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	
+	<insert id="insertRcScanRuleDetailValueSelective" parameterType="com.cjhx.risk.scan.model.RcScanRuleDetailValue">
+		insert into RC_SCAN_RULE_DETAIL_4_STOCK
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="scanRuleDetailId != null">
+				SCAN_RULE_DETAIL_ID,
+			</if>
+			<if test="productionId != null">
+				PRODUCTION_ID,
+			</if>
+			<if test="productionName != null">
+				PRODUCTION_NAME,
+			</if>
+			<if test="productionType != null">
+				PRODUCTION_TYPE,
+			</if>
+			<if test="stockId != null">
+				STOCK_ID,
+			</if>
+			<if test="stockName != null">
+				STOCK_NAME,
+			</if>
+			<if test="computeValue != null">
+				COMPUTE_VALUE,
+			</if>
+			<if test="comupteDate != null">
+				COMUPTE_DATE,
+			</if>
+			<if test="computeTime != null">
+				COMPUTE_TIME,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="scanRuleDetailId != null">
+				#{scanRuleDetailId,jdbcType=CHAR},
+			</if>
+			<if test="productionId != null">
+				#{productionId,jdbcType=VARCHAR},
+			</if>
+			<if test="productionName != null">
+				#{productionName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionType != null">
+				#{productionType,jdbcType=CHAR},
+			</if>
+			<if test="stockId != null">
+				#{stockId,jdbcType=VARCHAR},
+			</if>
+			<if test="stockName != null">
+				#{stockName,jdbcType=VARCHAR},
+			</if>
+			<if test="computeValue != null">
+				#{computeValue,jdbcType=VARCHAR},
+			</if>
+			<if test="comupteDate != null">
+				#{comupteDate,jdbcType=DECIMAL},
+			</if>
+			<if test="computeTime != null">
+				#{computeTime,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	
+</mapper>

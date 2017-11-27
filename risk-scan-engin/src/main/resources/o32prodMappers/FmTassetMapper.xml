@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.o32prod.dao.FmTassetMapper">
+	<resultMap id="BaseResultMap" type="com.cjhx.risk.o32prod.domain.FmTasset">
+		<result column="L_ASSET_ID" jdbcType="DECIMAL" property="lAssetId" />
+		<result column="L_FUND_ID" jdbcType="DECIMAL" property="lFundId" />
+		<result column="VC_ASSET_NAME" jdbcType="VARCHAR" property="vcAssetName" />
+	</resultMap>
+
+	<select id="selectAssetNameByAssetId" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		select VC_ASSET_NAME
+		from FM_TASSET
+		where L_ASSET_ID = #{assetId}
+	</select>
+	
+</mapper>

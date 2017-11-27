@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.o32prod.dao.FmTfundinfoMapper">
+	<resultMap id="BaseResultMap" type="com.cjhx.risk.o32prod.domain.FmTfundinfo">
+		<result column="L_FUND_ID" jdbcType="DECIMAL" property="lFundId" />
+		<result column="VC_FUND_CODE" jdbcType="VARCHAR" property="vcFundCode" />
+		<result column="VC_FUND_NAME" jdbcType="VARCHAR" property="vcFundName" />
+	</resultMap>
+	
+	<select id="callTradingDay" resultType="java.lang.Integer">
+		select sf_get_date(#{l_date,jdbcType=DECIMAL},#{l_offset_days,jdbcType=DECIMAL},#{l_mode,jdbcType=DECIMAL},#{c_market_no,jdbcType=CHAR}) from dual
+	</select>
+  
+	<select id="selectFundInfoByFundId" parameterType="java.lang.String"
+		resultType="com.cjhx.risk.o32prod.domain.FmTfundinfo">
+		select VC_FUND_CODE as vcFundCode,VC_FUND_NAME as vcFundName
+		from fm_tfundinfo
+		where L_FUND_ID = #{fundId}
+	</select>
+
+	<select id="selectFundCodeByFundId" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		select VC_FUND_CODE
+		from fm_tfundinfo
+		where L_FUND_ID = #{fundId}
+	</select>
+	
+</mapper>

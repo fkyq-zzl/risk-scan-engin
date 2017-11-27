@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.o32scan.dao.FmThgregisterMapper">
+	
+	<select id="selectThgInfos" resultType="com.cjhx.risk.o32scan.domain.FmThgInfo">
+		(SELECT FMTR.L_SERIAL_NO lSerialNo,
+                FMTR.L_FUND_ID lFundId,
+                FMTR.EN_DEAL_BALANCE enDealBalance,
+                FMTR.VC_INTER_CODE vcInterCode,
+                NVL((SELECT SUM (FMTG.L_MORTAGAGE_AMOUNT * COALESCE(VW.EN_CB_VALUE_NET_VALUE,0))
+                   FROM FM_THGMORTAGAGE FMTG
+                        INNER JOIN ALL_STOCK_INFO_HIS VW ON FMTG.VC_INTER_CODE = VW.VC_INTER_CODE_O32
+                  WHERE FMTG.L_SERIAL_NO = FMTR.L_SERIAL_NO AND VW.L_DATE = #{date} ),0) fairValue
+           FROM FM_THGREGISTER FMTR
+          WHERE FMTR.L_FUND_ID in
+          		<foreach item="item" collection="fundIds" separator="," open="(" close=")" index="index">
+          			#{item}
+          		</foreach>
+            AND FMTR.C_ENTRUST_DIRECTION = '6'
+            AND FMTR.L_HG_DATE <![CDATA[<=]]> #{date}
+            AND FMTR.L_REDEEM_LAWDATE > #{date} )
+        UNION
+        (SELECT FMTR.L_SERIAL_NO lSerialNo,
+                FMTR.L_FUND_ID lFundId,
+                FMTR.EN_DEAL_BALANCE enDealBalance,
+                FMTR.VC_INTER_CODE vcInterCode,
+                NVL((SELECT SUM (FMTG.L_MORTAGAGE_AMOUNT * COALESCE(VW.EN_CZ_VALUE_NET_VALUE,VW.EN_CZ_VALUE_NET_VALUE,0))
+                   FROM FM_THGMORTAGAGE FMTG
+                        INNER JOIN ALL_STOCK_INFO_HIS VW ON FMTG.VC_INTER_CODE = VW.VC_INTER_CODE_O32
+                  WHERE FMTG.L_SERIAL_NO = FMTR.L_SERIAL_NO  AND VW.L_DATE = #{date} ),0) fairValue
+           FROM FM_THGREGISTER FMTR
+          WHERE FMTR.L_FUND_ID in
+          		<foreach item="item" collection="fundIds" separator="," open="(" close=")" index="index">
+          			#{item}
+          		</foreach>
+            AND FMTR.C_ENTRUST_DIRECTION = '16'
+            AND FMTR.L_HG_DATE <![CDATA[<=]]> #{date}
+            AND FMTR.L_REDEEM_LAWDATE > #{date})
+        UNION
+        (SELECT FMTR.L_SERIAL_NO lSerialNo,
+                FMTR.L_FUND_ID lFundId,
+                FMTR.EN_DEAL_BALANCE enDealBalance,
+                FMTR.VC_INTER_CODE vcInterCode,
+                NVL((SELECT SUM (FMTG.L_MORTAGAGE_AMOUNT * COALESCE(VW.EN_CB_VALUE_NET_VALUE,0))
+                   FROM FM_THGMORTAGAGE FMTG
+                        INNER JOIN ALL_STOCK_INFO_HIS VW ON FMTG.VC_INTER_CODE = VW.VC_INTER_CODE_O32
+                  WHERE FMTG.L_SERIAL_NO = FMTR.L_SERIAL_NO AND FMTR.L_DATE = FMTG.L_DATE AND VW.L_DATE = #{date} ),0) fairValue
+           FROM FM_THISHGREGISTER FMTR
+          WHERE FMTR.L_FUND_ID in
+          		<foreach item="item" collection="fundIds" separator="," open="(" close=")" index="index">
+          			#{item}
+          		</foreach>
+            AND FMTR.C_ENTRUST_DIRECTION = '6'
+            AND FMTR.L_HG_DATE <![CDATA[<=]]> #{date}
+            AND FMTR.L_REDEEM_LAWDATE > #{date} )
+         UNION
+        (SELECT FMTR.L_SERIAL_NO lSerialNo,
+                FMTR.L_FUND_ID lFundId,
+                FMTR.EN_DEAL_BALANCE enDealBalance,
+                FMTR.VC_INTER_CODE vcInterCode,
+                NVL((SELECT SUM (FMTG.L_MORTAGAGE_AMOUNT * COALESCE(VW.EN_CZ_VALUE_NET_VALUE,VW.EN_CZ_VALUE_NET_VALUE,0))
+                   FROM FM_THGMORTAGAGE FMTG
+                        INNER JOIN ALL_STOCK_INFO_HIS VW ON FMTG.VC_INTER_CODE = VW.VC_INTER_CODE_O32
+                  WHERE FMTG.L_SERIAL_NO = FMTR.L_SERIAL_NO AND FMTR.L_DATE = FMTG.L_DATE  AND VW.L_DATE = #{date} ),0) fairValue
+           FROM FM_THISHGREGISTER FMTR
+          WHERE FMTR.L_FUND_ID in
+          		<foreach item="item" collection="fundIds" separator="," open="(" close=")" index="index">
+          			#{item}
+          		</foreach>
+            AND FMTR.C_ENTRUST_DIRECTION = '16'
+            AND FMTR.L_HG_DATE <![CDATA[<=]]> #{date}
+            AND FMTR.L_REDEEM_LAWDATE > #{date})  
+	</select>
+	
+</mapper>

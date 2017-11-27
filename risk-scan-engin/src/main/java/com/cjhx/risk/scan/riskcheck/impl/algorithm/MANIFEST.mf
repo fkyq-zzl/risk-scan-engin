@@ -1,0 +1,7 @@
+Manifest-Version: 1.0.1
+Created-By: Irving.cc
+Build-Jdk: 1.8
+Function: special rule item algorithm package
+List: 
+1. reverse buyback pledge rate monitor
+2. Buyback collateral restrictio

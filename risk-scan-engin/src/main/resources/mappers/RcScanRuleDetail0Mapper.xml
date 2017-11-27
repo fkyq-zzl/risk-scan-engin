@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.scan.dao.RcScanRuleDetail0Mapper">
+	<resultMap id="BaseResultMap" type="com.cjhx.risk.scan.model.RcScanRuleDetail">
+		<id column="SCAN_RULE_DETAIL_ID" jdbcType="CHAR" property="scanRuleDetailId" />
+		<result column="SCAN_RULE_ID" jdbcType="CHAR" property="scanRuleId" />
+		<result column="RULE_ID" jdbcType="CHAR" property="ruleId" />
+		<result column="PRODUCTION_ID" jdbcType="VARCHAR" property="productionId" />
+		<result column="PRODUCTION_NAME" jdbcType="VARCHAR" property="productionName" />
+		<result column="PRODUCTION_TYPE" jdbcType="CHAR" property="productionType" />
+		<result column="STOCK_ID" jdbcType="VARCHAR" property="stockId" />
+		<result column="STOCK_NAME" jdbcType="VARCHAR" property="stockName" />
+		<result column="ISSUER_ID" jdbcType="VARCHAR" property="issuerId" />
+		<result column="ISSUER_NAME" jdbcType="VARCHAR" property="issuerName" />
+		<result column="CHECK_RESULT" jdbcType="CHAR" property="checkResult" />
+		<result column="RISK_ACCMULATION" jdbcType="DECIMAL" property="riskAccmulation" />
+		<result column="COMPUTE_VALUE" jdbcType="VARCHAR" property="computeValue" />
+		<result column="SET_VALUE" jdbcType="VARCHAR" property="setValue" />
+		<result column="COMUPTE_DATE" jdbcType="DECIMAL" property="comupteDate" />
+		<result column="COMPUTE_TIME" jdbcType="DECIMAL" property="computeTime" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		SCAN_RULE_DETAIL_ID, SCAN_RULE_ID, RULE_ID, PRODUCTION_ID, PRODUCTION_NAME,
+		PRODUCTION_TYPE,
+		STOCK_ID, STOCK_NAME, ISSUER_ID, ISSUER_NAME, CHECK_RESULT, RISK_ACCMULATION,
+		COMPUTE_VALUE,
+		SET_VALUE, COMUPTE_DATE, COMPUTE_TIME
+	</sql>
+
+	<select id="getScanSeqId" resultType="java.lang.String">
+		select LPAD(TO_CHAR(SEQ_RC_SCAN_RULE_DETAIL_0.NEXTVAL),20,'0') from dual
+	</select>
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from RC_SCAN_RULE_DETAIL_0
+		where SCAN_RULE_DETAIL_ID = #{scanRuleDetailId,jdbcType=CHAR}
+	</select>
+	
+	<select id="selectTriggerRcScanRuleDetailByScanRuleId" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from RC_SCAN_RULE_DETAIL_0
+		where SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR}
+		and CHECK_RESULT in ('1','2','3')
+		and EXCLUDE_BY_MUTEX = '0'
+		and EXCLUDE_BY_UNION = '0'
+	</select>
+	
+	<select id="selectRiskAccmulationOfTheDayBefore" resultType="com.cjhx.risk.scan.model.RcScanRuleDetail">
+		with scan_id_tb as
+		  (select temp.scanId,temp.startDate from (
+		    select row_number() over(order by s.sequence desc) as rnum, 
+		    s.scan_id as scanId,s.start_date as startDate
+		    from rc_scan s
+		    where s.status = 'C'
+		    and s.sequence <![CDATA[<]]> (select s.sequence from rc_scan s where s.scan_id = #{scanId})
+		  )temp
+		  where temp.rnum = ${rowNum})
+		
+		select (select startDate from scan_id_tb) as comupteDate,
+		       db.risk_accmulation as riskAccmulation,
+		       de.status as status
+		from rc_scan_rule_detail_0 db,rc_scan_rule_detail_0 d0,rc_scan_rule de
+		where db.check_result in ('1','2','3')
+		and db.exclude_by_mutex = '0'
+		and db.exclude_by_union = '0'
+		and db.scan_rule_id = de.scan_rule_id
+		and (de.status = '1' or de.status = '0' and de.check_result in ('1','2','3'))
+		and de.scan_id = (select scanId from scan_id_tb)
+		and db.rule_id = d0.rule_id
+		and db.production_id = d0.production_id
+		and db.production_type = d0.production_type
+		and db.stock_id = d0.stock_id                
+		and d0.scan_rule_detail_id = #{scanRuleDetailId}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from RC_SCAN_RULE_DETAIL_0
+		where SCAN_RULE_DETAIL_ID = #{scanRuleDetailId,jdbcType=CHAR}
+	</delete>
+	<insert id="insert" parameterType="com.cjhx.risk.scan.domain.RcScanRuleDetail0">
+		insert into RC_SCAN_RULE_DETAIL_0 (SCAN_RULE_DETAIL_ID, SCAN_RULE_ID,
+		RULE_ID,
+		PRODUCTION_ID, PRODUCTION_NAME, PRODUCTION_TYPE,
+		STOCK_ID, STOCK_NAME, ISSUER_ID,
+		ISSUER_NAME, CHECK_RESULT, RISK_ACCMULATION,
+		COMPUTE_VALUE, SET_VALUE, COMUPTE_DATE,
+		COMPUTE_TIME)
+		values (#{scanRuleDetailId,jdbcType=CHAR}, #{scanRuleId,jdbcType=CHAR},
+		#{ruleId,jdbcType=CHAR},
+		#{productionId,jdbcType=VARCHAR}, #{productionName,jdbcType=VARCHAR}, #{productionType,jdbcType=CHAR},
+		#{stockId,jdbcType=VARCHAR}, #{stockName,jdbcType=VARCHAR},
+		#{issuerId,jdbcType=VARCHAR},
+		#{issuerName,jdbcType=VARCHAR}, #{checkResult,jdbcType=CHAR}, #{riskAccmulation,jdbcType=DECIMAL},
+		#{computeValue,jdbcType=VARCHAR}, #{setValue,jdbcType=VARCHAR},
+		#{comupteDate,jdbcType=DECIMAL},
+		#{computeTime,jdbcType=DECIMAL})
+	</insert>
+	<insert id="insertSelective" parameterType="com.cjhx.risk.scan.domain.RcScanRuleDetail0">
+		insert into RC_SCAN_RULE_DETAIL_0
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="scanRuleDetailId != null">
+				SCAN_RULE_DETAIL_ID,
+			</if>
+			<if test="scanRuleId != null">
+				SCAN_RULE_ID,
+			</if>
+			<if test="ruleId != null">
+				RULE_ID,
+			</if>
+			<if test="productionId != null">
+				PRODUCTION_ID,
+			</if>
+			<if test="productionName != null">
+				PRODUCTION_NAME,
+			</if>
+			<if test="productionType != null">
+				PRODUCTION_TYPE,
+			</if>
+			<if test="stockId != null">
+				STOCK_ID,
+			</if>
+			<if test="stockName != null">
+				STOCK_NAME,
+			</if>
+			<if test="issuerId != null">
+				ISSUER_ID,
+			</if>
+			<if test="issuerName != null">
+				ISSUER_NAME,
+			</if>
+			<if test="checkResult != null">
+				CHECK_RESULT,
+			</if>
+			<if test="riskAccmulation != null">
+				RISK_ACCMULATION,
+			</if>
+			<if test="computeValue != null">
+				COMPUTE_VALUE,
+			</if>
+			<if test="setValue != null">
+				SET_VALUE,
+			</if>
+			<if test="comupteDate != null">
+				COMUPTE_DATE,
+			</if>
+			<if test="computeTime != null">
+				COMPUTE_TIME,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="scanRuleDetailId != null">
+				#{scanRuleDetailId,jdbcType=CHAR},
+			</if>
+			<if test="scanRuleId != null">
+				#{scanRuleId,jdbcType=CHAR},
+			</if>
+			<if test="ruleId != null">
+				#{ruleId,jdbcType=CHAR},
+			</if>
+			<if test="productionId != null">
+				#{productionId,jdbcType=VARCHAR},
+			</if>
+			<if test="productionName != null">
+				#{productionName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionType != null">
+				#{productionType,jdbcType=CHAR},
+			</if>
+			<if test="stockId != null">
+				#{stockId,jdbcType=VARCHAR},
+			</if>
+			<if test="stockName != null">
+				#{stockName,jdbcType=VARCHAR},
+			</if>
+			<if test="issuerId != null">
+				#{issuerId,jdbcType=VARCHAR},
+			</if>
+			<if test="issuerName != null">
+				#{issuerName,jdbcType=VARCHAR},
+			</if>
+			<if test="checkResult != null">
+				#{checkResult,jdbcType=CHAR},
+			</if>
+			<if test="riskAccmulation != null">
+				#{riskAccmulation,jdbcType=DECIMAL},
+			</if>
+			<if test="computeValue != null">
+				#{computeValue,jdbcType=VARCHAR},
+			</if>
+			<if test="setValue != null">
+				#{setValue,jdbcType=VARCHAR},
+			</if>
+			<if test="comupteDate != null">
+				#{comupteDate,jdbcType=DECIMAL},
+			</if>
+			<if test="computeTime != null">
+				#{computeTime,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<insert id="insertRcScanRuleDetailSelective" parameterType="com.cjhx.risk.scan.model.RcScanRuleDetail">
+		insert into RC_SCAN_RULE_DETAIL_0
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="scanRuleDetailId != null">
+				SCAN_RULE_DETAIL_ID,
+			</if>
+			<if test="scanRuleId != null">
+				SCAN_RULE_ID,
+			</if>
+			<if test="ruleId != null">
+				RULE_ID,
+			</if>
+			<if test="productionId != null">
+				PRODUCTION_ID,
+			</if>
+			<if test="productionName != null">
+				PRODUCTION_NAME,
+			</if>
+			<if test="productionType != null">
+				PRODUCTION_TYPE,
+			</if>
+			<if test="stockId != null">
+				STOCK_ID,
+			</if>
+			<if test="stockName != null">
+				STOCK_NAME,
+			</if>
+			<if test="issuerId != null">
+				ISSUER_ID,
+			</if>
+			<if test="issuerName != null">
+				ISSUER_NAME,
+			</if>
+			<if test="checkResult != null">
+				CHECK_RESULT,
+			</if>
+			<if test="riskAccmulation != null">
+				RISK_ACCMULATION,
+			</if>
+			<if test="computeValue != null">
+				COMPUTE_VALUE,
+			</if>
+			<if test="setValue != null">
+				SET_VALUE,
+			</if>
+			<if test="comupteDate != null">
+				COMUPTE_DATE,
+			</if>
+			<if test="computeTime != null">
+				COMPUTE_TIME,
+			</if>
+			<if test="remark != null">
+				REMARK,
+			</if>
+			EXCLUDE_BY_MUTEX,
+			EXCLUDE_BY_UNION
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="scanRuleDetailId != null">
+				#{scanRuleDetailId,jdbcType=CHAR},
+			</if>
+			<if test="scanRuleId != null">
+				#{scanRuleId,jdbcType=CHAR},
+			</if>
+			<if test="ruleId != null">
+				#{ruleId,jdbcType=CHAR},
+			</if>
+			<if test="productionId != null">
+				#{productionId,jdbcType=VARCHAR},
+			</if>
+			<if test="productionName != null">
+				#{productionName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionType != null">
+				#{productionType,jdbcType=CHAR},
+			</if>
+			<if test="stockId != null">
+				#{stockId,jdbcType=VARCHAR},
+			</if>
+			<if test="stockName != null">
+				#{stockName,jdbcType=VARCHAR},
+			</if>
+			<if test="issuerId != null">
+				#{issuerId,jdbcType=VARCHAR},
+			</if>
+			<if test="issuerName != null">
+				#{issuerName,jdbcType=VARCHAR},
+			</if>
+			<if test="checkResult != null">
+				#{checkResult,jdbcType=CHAR},
+			</if>
+			<if test="riskAccmulation != null">
+				#{riskAccmulation,jdbcType=DECIMAL},
+			</if>
+			<if test="computeValue != null">
+				#{computeValue,jdbcType=VARCHAR},
+			</if>
+			<if test="setValue != null">
+				#{setValue,jdbcType=VARCHAR},
+			</if>
+			<if test="comupteDate != null">
+				#{comupteDate,jdbcType=DECIMAL},
+			</if>
+			<if test="computeTime != null">
+				#{computeTime,jdbcType=DECIMAL},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			'0',
+			'0'
+		</trim>
+	</insert>
+	
+	<update id="excludeSingleFundSameStockByMutex">
+		update rc_scan_rule_detail_0 set exclude_by_mutex = '1'
+		where scan_rule_detail_id in (
+		                          select d0.scan_rule_detail_id 
+		                          from rc_scan_rule_detail_0 d0
+		                          inner join rc_scan_rule sr on d0.scan_rule_id = sr.scan_rule_id 
+		                                                        and sr.scan_id = #{scanId} and sr.status = '0'
+		                          where (exists 
+		                                      (select 'X' from RC_RULE_MUTEX hm
+		                                       where hm.RULE_ID = d0.rule_id
+		                                       and hm.MUTEX_LEVEL = '1'
+		                                       and exists
+		                                                (select hd0.rule_id as ruleId
+		                                                 from rc_scan_rule_detail_0 hd0
+		                                                 inner join rc_scan_rule hsr on hd0.scan_rule_id = hsr.scan_rule_id 
+		                                                                          and hsr.scan_id = #{scanId} and hsr.status = '0'
+		                                                 where hd0.production_id = d0.production_id
+		                                                 and hd0.production_type = d0.production_type
+		                                                 and hd0.stock_id = d0.stock_id
+		                                                 and hd0.rule_id != d0.rule_id
+		                                                 and hm.MUTEX_RULE_ID = hd0.rule_id))
+		                               or d0.rule_id in 
+		                                               (select distinct lm.MUTEX_RULE_ID
+		                                                from RC_RULE_MUTEX lm
+		                                                where lm.RULE_ID in
+		                                                                  (select distinct ld0.rule_id
+		                                                                   from rc_scan_rule_detail_0 ld0
+		                                                                   inner join rc_scan_rule lsr on ld0.scan_rule_id = lsr.scan_rule_id 
+		                                                                                            and lsr.scan_id = #{scanId} and lsr.status = '0'
+		                                                                   where ld0.production_id = d0.production_id
+		                                                                   and ld0.production_type = d0.production_type
+		                                                                   and ld0.stock_id = d0.stock_id
+		                                                                   and ld0.rule_id != d0.rule_id)     
+		                                                and lm.MUTEX_LEVEL = '0')
+		                          )
+		)
+	</update>
+	<update id="excludeSingleFundSameStockByUnion">
+		update rc_scan_rule_detail_0 set exclude_by_union = '1'
+		where exclude_by_union != '1' and exclude_by_mutex != '1'
+		and scan_rule_detail_id in (
+		
+		                              select d0.scan_rule_detail_id 
+		                              from rc_scan_rule_detail_0 d0
+		                              inner join rc_scan_rule sr on d0.scan_rule_id = sr.scan_rule_id 
+		                                                            and sr.scan_id = #{scanId} and sr.status = '0'
+		                              where exists(
+		                                            select 'X'
+		                                            from RC_RULE_UNION u
+		                                            where u.RULE_ID = d0.rule_id
+		                                            and u.UNION_RULE_ID not in
+		                                            (select ud0.rule_id as ruleId
+		                                            from rc_scan_rule_detail_0 ud0
+		                                            inner join rc_scan_rule usr on ud0.scan_rule_id = usr.scan_rule_id 
+		                                                                           and usr.scan_id = #{scanId} and usr.status = '0'
+		                                            where ud0.exclude_by_union = '0' 
+		                                            and ud0.exclude_by_mutex = '0'
+		                                            and ud0.rule_id != d0.rule_id))
+		)
+	</update>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cjhx.risk.scan.domain.RcScanRuleDetail0">
+		update RC_SCAN_RULE_DETAIL_0
+		<set>
+			<if test="scanRuleId != null">
+				SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR},
+			</if>
+			<if test="ruleId != null">
+				RULE_ID = #{ruleId,jdbcType=CHAR},
+			</if>
+			<if test="productionId != null">
+				PRODUCTION_ID = #{productionId,jdbcType=VARCHAR},
+			</if>
+			<if test="productionName != null">
+				PRODUCTION_NAME = #{productionName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionType != null">
+				PRODUCTION_TYPE = #{productionType,jdbcType=CHAR},
+			</if>
+			<if test="stockId != null">
+				STOCK_ID = #{stockId,jdbcType=VARCHAR},
+			</if>
+			<if test="stockName != null">
+				STOCK_NAME = #{stockName,jdbcType=VARCHAR},
+			</if>
+			<if test="issuerId != null">
+				ISSUER_ID = #{issuerId,jdbcType=VARCHAR},
+			</if>
+			<if test="issuerName != null">
+				ISSUER_NAME = #{issuerName,jdbcType=VARCHAR},
+			</if>
+			<if test="checkResult != null">
+				CHECK_RESULT = #{checkResult,jdbcType=CHAR},
+			</if>
+			<if test="riskAccmulation != null">
+				RISK_ACCMULATION = #{riskAccmulation,jdbcType=DECIMAL},
+			</if>
+			<if test="computeValue != null">
+				COMPUTE_VALUE = #{computeValue,jdbcType=VARCHAR},
+			</if>
+			<if test="setValue != null">
+				SET_VALUE = #{setValue,jdbcType=VARCHAR},
+			</if>
+			<if test="comupteDate != null">
+				COMUPTE_DATE = #{comupteDate,jdbcType=DECIMAL},
+			</if>
+			<if test="computeTime != null">
+				COMPUTE_TIME = #{computeTime,jdbcType=DECIMAL},
+			</if>
+		</set>
+		where SCAN_RULE_DETAIL_ID = #{scanRuleDetailId,jdbcType=CHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.cjhx.risk.scan.domain.RcScanRuleDetail0">
+		update RC_SCAN_RULE_DETAIL_0
+		set SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR},
+		RULE_ID = #{ruleId,jdbcType=CHAR},
+		PRODUCTION_ID = #{productionId,jdbcType=VARCHAR},
+		PRODUCTION_NAME = #{productionName,jdbcType=VARCHAR},
+		PRODUCTION_TYPE = #{productionType,jdbcType=CHAR},
+		STOCK_ID = #{stockId,jdbcType=VARCHAR},
+		STOCK_NAME = #{stockName,jdbcType=VARCHAR},
+		ISSUER_ID = #{issuerId,jdbcType=VARCHAR},
+		ISSUER_NAME = #{issuerName,jdbcType=VARCHAR},
+		CHECK_RESULT = #{checkResult,jdbcType=CHAR},
+		RISK_ACCMULATION = #{riskAccmulation,jdbcType=DECIMAL},
+		COMPUTE_VALUE = #{computeValue,jdbcType=VARCHAR},
+		SET_VALUE = #{setValue,jdbcType=VARCHAR},
+		COMUPTE_DATE = #{comupteDate,jdbcType=DECIMAL},
+		COMPUTE_TIME = #{computeTime,jdbcType=DECIMAL}
+		where SCAN_RULE_DETAIL_ID = #{scanRuleDetailId,jdbcType=CHAR}
+	</update>
+	
+	<update id="updateRcScanRuleDetailByScanRuleDetailIdSelective" parameterType="com.cjhx.risk.scan.domain.RcScanRuleDetail0">
+		update RC_SCAN_RULE_DETAIL_0
+		<set>
+			<if test="scanRuleId != null">
+				SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR},
+			</if>
+			<if test="ruleId != null">
+				RULE_ID = #{ruleId,jdbcType=CHAR},
+			</if>
+			<if test="productionId != null">
+				PRODUCTION_ID = #{productionId,jdbcType=VARCHAR},
+			</if>
+			<if test="productionName != null">
+				PRODUCTION_NAME = #{productionName,jdbcType=VARCHAR},
+			</if>
+			<if test="productionType != null">
+				PRODUCTION_TYPE = #{productionType,jdbcType=CHAR},
+			</if>
+			<if test="stockId != null">
+				STOCK_ID = #{stockId,jdbcType=VARCHAR},
+			</if>
+			<if test="stockName != null">
+				STOCK_NAME = #{stockName,jdbcType=VARCHAR},
+			</if>
+			<if test="issuerId != null">
+				ISSUER_ID = #{issuerId,jdbcType=VARCHAR},
+			</if>
+			<if test="issuerName != null">
+				ISSUER_NAME = #{issuerName,jdbcType=VARCHAR},
+			</if>
+			<if test="checkResult != null">
+				CHECK_RESULT = #{checkResult,jdbcType=CHAR},
+			</if>
+			<if test="riskAccmulation != null">
+				RISK_ACCMULATION = #{riskAccmulation,jdbcType=DECIMAL},
+			</if>
+			<if test="computeValue != null">
+				COMPUTE_VALUE = #{computeValue,jdbcType=VARCHAR},
+			</if>
+			<if test="setValue != null">
+				SET_VALUE = #{setValue,jdbcType=VARCHAR},
+			</if>
+			<if test="comupteDate != null">
+				COMUPTE_DATE = #{comupteDate,jdbcType=DECIMAL},
+			</if>
+			<if test="computeTime != null">
+				COMPUTE_TIME = #{computeTime,jdbcType=DECIMAL},
+			</if>
+		</set>
+		where SCAN_RULE_DETAIL_ID = #{scanRuleDetailId,jdbcType=CHAR}
+	</update>
+	
+	<update id="updateInvestRangeTriggerStocks" parameterType="com.cjhx.risk.scan.domain.RcScanRuleDetail0">
+		update RC_SCAN_RULE_DETAIL_0
+		set 
+		CHECK_RESULT = '2',
+		COMUPTE_DATE = #{comupteDate,jdbcType=DECIMAL},
+		COMPUTE_TIME = #{computeTime,jdbcType=DECIMAL}
+		where SCAN_RULE_ID = #{scanRuleId,jdbcType=CHAR}
+		<if test="productStocks != null">
+			and STOCK_ID not in
+							<foreach item="stock" collection="productStocks" 
+								separator="," open="(" close=")" index="index">
+								#{stock.vcInterCodeO32}
+							</foreach>
+		</if>
+	</update>
+	
+</mapper>

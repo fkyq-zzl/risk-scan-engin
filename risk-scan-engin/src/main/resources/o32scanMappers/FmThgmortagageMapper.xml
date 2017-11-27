@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjhx.risk.o32scan.dao.FmThgmortagageMapper">
+	
+	<select id="selectBuyBackDetails" resultType="com.cjhx.risk.o32scan.domain.FmThgmortagage">
+		SELECT HIS.VC_INTER_CODE_O32 stockId,
+		       HIS.VC_STOCK_NAME stockName,
+		       FMT1.L_MORTAGAGE_AMOUNT lMortagageAmount
+		  FROM FM_THGREGISTER FMT
+		       INNER JOIN FM_THGMORTAGAGE FMT1 ON FMT.L_SERIAL_NO = FMT1.L_SERIAL_NO
+		       INNER JOIN ALL_STOCK_INFO_HIS HIS ON FMT1.VC_INTER_CODE = HIS.VC_INTER_CODE_O32
+		 WHERE FMT.L_SERIAL_NO = #{lSerialNo}
+		       GROUP BY HIS.VC_INTER_CODE_O32,HIS.VC_STOCK_NAME,FMT1.L_MORTAGAGE_AMOUNT
+	</select>
+	
+	<select id="selectDetails" resultType="com.cjhx.risk.o32scan.domain.FmThgmortagage">
+		SELECT HIS.VC_INTER_CODE_O32 stockId,
+		       HIS.VC_STOCK_NAME stockName,
+		       FMT1.L_MORTAGAGE_AMOUNT lMortagageAmount,
+		       DECODE(FMT.C_ENTRUST_DIRECTION,'6','中债','16','中证') type,
+		       DECODE(FMT.C_ENTRUST_DIRECTION,'6',HIS.EN_CB_VALUE_NET_VALUE,'16',HIS.EN_CZ_VALUE_NET_VALUE ) netValue
+		  FROM FM_THGREGISTER FMT
+		       INNER JOIN FM_THGMORTAGAGE FMT1 ON FMT.L_SERIAL_NO = FMT1.L_SERIAL_NO
+		       INNER JOIN ALL_STOCK_INFO_HIS HIS ON FMT1.VC_INTER_CODE = HIS.VC_INTER_CODE_O32
+		 WHERE FMT.L_SERIAL_NO = #{lSerialNo}
+		   AND HIS.L_DATE = #{lDate}
+	</select>
+	
+</mapper>
